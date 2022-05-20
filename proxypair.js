@@ -24,6 +24,7 @@ class ProxyPair {
     this.onError = this.onError.bind(this);
     this.flush = this.flush.bind(this);
 
+    this.relayURL = undefined;
     this.relayAddr = relayAddr;
     this.rateLimit = rateLimit;
     this.config = config;
@@ -82,14 +83,14 @@ class ProxyPair {
     channel.onclose = () => {
       log('WebRTC DataChannel closed.');
       snowflake.ui.setStatus('disconnected by webrtc.');
-      if(this.counted) {
+      if (this.counted) {
         snowflake.ui.decreaseClients();
         this.counted = false;
       }
       this.flush();
       return this.close();
     };
-    channel.onerror = function() {
+    channel.onerror = function () {
       return log('Data channel error!');
     };
     channel.binaryType = "arraybuffer";
@@ -112,7 +113,10 @@ class ProxyPair {
     if (peer_ip != null) {
       params.push(["client_ip", peer_ip]);
     }
-    var relay = this.relay = WS.makeWebsocket(this.relayAddr, params);
+    var relay = this.relay =
+      (this.relayURL === undefined) ?
+        WS.makeWebsocket(this.relayAddr, params) :
+        WS.makeWebsocketFromURL(this.relayURL, params);
     this.relay.label = 'websocket-relay';
     this.relay.onopen = () => {
       if (this.timer) {
@@ -125,7 +129,7 @@ class ProxyPair {
     this.relay.onclose = () => {
       log(relay.label + ' closed.');
       snowflake.ui.setStatus('disconnected.');
-      if(this.counted) {
+      if (this.counted) {
         snowflake.ui.decreaseClients();
         this.counted = false;
       }
@@ -246,6 +250,10 @@ class ProxyPair {
 
   peerConnOpen() {
     return (null !== this.pc) && ('closed' !== this.pc.connectionState);
+  }
+
+  setRelayURL(relayURL) {
+    this.relayURL = relayURL;
   }
 
 }

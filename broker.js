@@ -67,11 +67,12 @@ class Broker {
       this._xhr = xhr; // Used by spec to fake async Broker interaction
       const clients = Math.floor(numClientsConnected / 8) * 8;
       var data = {
-        Version: "1.2",
+        Version: "1.3",
         Sid: id,
         Type: this.config.proxyType,
         NAT: this.natType,
         Clients: clients,
+        AcceptedRelayPattern: this.config.allowedRelayPattern,
       };
       return this._postRequest(xhr, 'proxy', JSON.stringify(data));
     });

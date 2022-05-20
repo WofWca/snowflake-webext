@@ -51,3 +51,5 @@ Config.prototype.pcConfig = {
 };
 
 Config.PROBEURL = "https://snowflake-broker.freehaven.net:8443/probe";
+
+Config.prototype.allowedRelayPattern="snowflake.torproject.net";

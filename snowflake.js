@@ -68,12 +68,12 @@ class Snowflake {
     }
     this.ui.setStatus(msg);
     //update NAT type
-    console.log("NAT type: "+ this.ui.natType);
+    console.log("NAT type: " + this.ui.natType);
     this.broker.setNATType(this.ui.natType);
     recv = this.broker.getClientOffer(pair.id, this.proxyPairs.length);
     recv.then((resp) => {
       var clientNAT = resp.NAT;
-      if (!this.receiveOffer(pair, resp.Offer)) {
+      if (!this.receiveOffer(pair, resp.Offer, resp.RelayURL)) {
         return pair.close();
       }
       //set a timeout for channel creation
@@ -83,14 +83,14 @@ class Snowflake {
           pair.close();
           // increase poll interval
           this.pollInterval =
-                Math.min(this.pollInterval + this.config.pollAdjustment,
-                  this.config.slowestBrokerPollInterval);
+            Math.min(this.pollInterval + this.config.pollAdjustment,
+              this.config.slowestBrokerPollInterval);
           if (clientNAT == "restricted") {
             this.natFailures++;
           }
           // if we fail to connect to a restricted client 3 times in
           // a row, assume we have a restricted NAT
-          if (this.natFailures >= 3){
+          if (this.natFailures >= 3) {
             this.ui.natType = "restricted";
             console.log("Learned NAT type: restricted");
             this.natFailures = 0;
@@ -99,13 +99,13 @@ class Snowflake {
         } else {
           // decrease poll interval
           this.pollInterval =
-                Math.max(this.pollInterval - this.config.pollAdjustment,
-                  this.config.defaultBrokerPollInterval);
+            Math.max(this.pollInterval - this.config.pollAdjustment,
+              this.config.defaultBrokerPollInterval);
           this.natFailures = 0;
         }
         return;
       }), this.config.datachannelTimeout);
-    }, function() {
+    }, function () {
       //on error, close proxy pair
       return pair.close();
     });
@@ -114,9 +114,24 @@ class Snowflake {
 
   // Receive an SDP offer from some client assigned by the Broker,
   // |pair| - an available ProxyPair.
-  receiveOffer(pair, desc) {
+  receiveOffer(pair, desc, relayURL) {
     var e, offer, sdp;
+
     try {
+      if (relayURL !== undefined) {
+        let relayURLParsed = new URL(relayURL);
+        let hostname = relayURLParsed.hostname;
+        let protocol = relayURLParsed.protocol;
+        if (protocol !== "wss:") {
+          log('incorrect relay url protocol');
+          return false;
+        }
+        if (!this.checkRelayPattern(this.config.allowedRelayPattern, hostname)) {
+          log('relay url hostname does not match allowed pattern');
+          return false;
+        }
+        pair.setRelayURL(relayURL);
+      }
       offer = JSON.parse(desc);
       dbg('Received:\n\n' + offer.sdp + '\n');
       sdp = new RTCSessionDescription(offer);
@@ -135,11 +150,11 @@ class Snowflake {
 
   sendAnswer(pair) {
     var fail, next;
-    next = function(sdp) {
+    next = function (sdp) {
       dbg('webrtc: Answer ready.');
       return pair.pc.setLocalDescription(sdp).catch(fail);
     };
-    fail = function() {
+    fail = function () {
       pair.close();
       return dbg('webrtc: Failed to create or set Answer');
     };
@@ -154,7 +169,7 @@ class Snowflake {
     pair = new ProxyPair(this.relayAddr, this.rateLimit, this.config);
     this.proxyPairs.push(pair);
 
-    log('Snowflake IDs: ' + (this.proxyPairs.map(function(p) {
+    log('Snowflake IDs: ' + (this.proxyPairs.map(function (p) {
       return p.id;
     })).join(' | '));
 
@@ -180,6 +195,32 @@ class Snowflake {
       results.push(this.proxyPairs.pop().close());
     }
     return results;
+  }
+
+  /**
+   * checkRelayPattern match str against patten
+   * @param {string} pattern
+   * @param {string} str typically a domain name to be checked
+   * @return {boolean}
+   */
+  checkRelayPattern(pattern, str) {
+    if (typeof pattern !== "string") {
+      throw 'invalid checkRelayPattern input: pattern';
+    }
+    if (typeof str !== "string") {
+      throw 'invalid checkRelayPattern input: str';
+    }
+
+    let exactMatch = false;
+    if (pattern.charAt(0) === "^") {
+      exactMatch = true;
+      pattern = pattern.substring(1);
+    }
+
+    if (exactMatch) {
+      return pattern.localeCompare(str) === 0;
+    }
+    return str.endsWith(pattern);
   }
 
 }
