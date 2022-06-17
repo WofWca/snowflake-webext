@@ -1,6 +1,6 @@
 build/
+build-webext/
 test/
-webext/snowflake.js
 snowflake-library.js
 
 # FIXME: Whittle these away

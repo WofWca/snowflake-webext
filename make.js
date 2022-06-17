@@ -164,8 +164,9 @@ task('build', 'build the snowflake proxy', function() {
 });
 
 task('webext', 'build the webextension', function() {
-  const outDir = 'webext';
-  execSync(`git clean -f -x -d ${outDir}/`);
+  const outDir = 'build-webext';
+  execSync(`rm -rf ${outDir} && mkdir ${outDir}`);
+  execSync(`cp -r webext/. ${outDir}/`);
   execSync(`cp -r ${STATIC}/{${SHARED_FILES.join(',')}} ${outDir}/`, { shell: '/bin/bash' });
   copyTranslations(outDir);
   concatJS(outDir, 'webext', 'snowflake.js', '');
@@ -187,7 +188,7 @@ var updateVersion = function(file, version) {
 task('pack-webext', 'pack the webextension for deployment', function() {
   try {
     execSync(`rm -f source.zip`);
-    execSync(`rm -f webext/webext.zip`);
+    execSync(`rm -f build-webext.zip`);
   } catch (error) {
     //Usually this happens because the zip files were removed previously
     console.log('Error removing zip files');
@@ -210,11 +211,11 @@ task('pack-webext', 'pack the webextension for deployment', function() {
   }
   execSync(`git archive -o source.zip HEAD .`);
   execSync(`npm run webext`);
-  execSync(`cd webext && zip -Xr webext.zip ./*`);
+  execSync(`cd build-webext && zip -Xr ../build-webext.zip ./*`);
 });
 
 task('clean', 'remove all built files', function() {
-  execSync('rm -rf build test spec/support');
+  execSync('rm -rf build build-webext test spec/support');
 });
 
 task('library', 'build the library', function() {

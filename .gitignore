@@ -5,14 +5,9 @@
 .DS_Store
 test
 build
+/build-webext
 node_modules
 snowflake-library.js
 spec/support
-webext/snowflake.js
-webext/popup.js
-webext/embed.html
-webext/embed.css
-webext/assets/
-webext/_locales/
 ignore/
 npm-debug.log

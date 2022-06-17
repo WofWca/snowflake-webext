@@ -25,7 +25,7 @@ npm install
 npm run webext
 ```
 
-and then load the `webext/` directory as an unpacked extension.
+and then load the `build-webext/` directory as an unpacked extension.
  * https://developer.mozilla.org/en-US/docs/Tools/about:debugging#Loading_a_temporary_extension
  * https://developer.chrome.com/extensions/getstarted#manifest
 
@@ -122,7 +122,7 @@ npm run pack-webext x.y.z
 git push origin master
 git push origin --tags
 
-# Upload the generated webext.zip (and source.zip) to the webextension stores,
+# Upload the generated build-webext.zip (and source.zip) to the webextension stores,
 # 1. https://addons.mozilla.org/en-US/developers/addon/torproject-snowflake/versions/submit/
 # 2. https://chrome.google.com/webstore/devconsole/
 
