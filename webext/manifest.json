@@ -24,5 +24,8 @@
   },
   "permissions": [
     "storage"
+  ],
+  "optional_permissions": [
+    "background"
   ]
 }

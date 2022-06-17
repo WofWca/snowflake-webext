@@ -1,3 +1,4 @@
+/* global chrome */
 /* exported Popup */
 
 // Add or remove a class from elem.classList, depending on cond.
@@ -25,6 +26,35 @@ class Popup {
     this.statusdesc = document.getElementById('statusdesc');
     this.img = document.getElementById('statusimg');
     this.button = document.querySelector('.button');
+    // if (SUPPORTS_WEBEXT_OPTIONAL_BACKGROUND_PERMISSION)
+    {
+      /** @type {HTMLInputElement} */
+      const runInBackgroundInput = document.getElementById('run-in-background');
+      document.getElementById('run-in-background-wrapper').classList.remove('display-none');
+      {
+        // Two-way bind the input to the permission.
+        new Promise(r => chrome.permissions.contains({ permissions: ['background'] }, r))
+        .then(contains => runInBackgroundInput.checked = contains);
+        chrome.permissions.onAdded.addListener(({ permissions }) => {
+          if (permissions.includes('background')) {
+            runInBackgroundInput.checked = true;
+          }
+        });
+        chrome.permissions.onRemoved.addListener(({ permissions }) => {
+          if (permissions.includes('background')) {
+            runInBackgroundInput.checked = false;
+          }
+        });
+        runInBackgroundInput.addEventListener('change', event => {
+          if (event.target.checked) {
+            new Promise(r => chrome.permissions.request({ permissions: ['background'] }, r))
+            .then(granted => event.target.checked = granted);
+          } else {
+            chrome.permissions.remove({ permissions: ['background'] });
+          }
+        });
+      }
+    }
   }
   setEnabled(enabled) {
     setClass(this.img, 'on', enabled);
