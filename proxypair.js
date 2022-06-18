@@ -1,6 +1,6 @@
 /* global snowflake, log, dbg, Util, Parse, WS */
 
-/*
+/**
 Represents a single:
 
    client <-- webrtc --> snowflake <-- websocket --> relay
@@ -11,11 +11,10 @@ Broker with an WebRTC answer.
 
 class ProxyPair {
 
-  /*
-  Constructs a ProxyPair where:
-  - @relayAddr is the destination relay
-  - @rateLimit specifies a rate limit on traffic
-  */
+  /**
+   * @param relayAddr the destination relay
+   * @param {*} rateLimit specifies a rate limit on traffic
+   */
   constructor(relayAddr, rateLimit, config) {
     this.prepareDataChannel = this.prepareDataChannel.bind(this);
     this.connectRelay = this.connectRelay.bind(this);
@@ -35,7 +34,7 @@ class ProxyPair {
     this.counted = false;
   }
 
-  // Prepare a WebRTC PeerConnection and await for an SDP offer.
+  /** Prepare a WebRTC PeerConnection and await for an SDP offer. */
   begin() {
     this.pc = new RTCPeerConnection(this.pcConfig);
     this.pc.onicecandidate = (evt) => {
@@ -69,7 +68,7 @@ class ProxyPair {
     return true;
   }
 
-  // Given a WebRTC DataChannel, prepare callbacks.
+  /** Given a WebRTC DataChannel, prepare callbacks. */
   prepareDataChannel(channel) {
     channel.onopen = () => {
       log('WebRTC DataChannel opened!');
@@ -96,7 +95,7 @@ class ProxyPair {
     return channel.onmessage = this.onClientToRelayMessage;
   }
 
-  // Assumes WebRTC datachannel is connected.
+  /** Assumes WebRTC datachannel is connected. */
   connectRelay() {
     dbg('Connecting to relay...');
     // Get a remote IP address from the PeerConnection, if possible. Add it to
@@ -147,7 +146,7 @@ class ProxyPair {
     }), 5000);
   }
 
-  // WebRTC --> websocket
+  /** WebRTC --> websocket */
   onClientToRelayMessage(msg) {
     if (this.messageTimer) {
       clearTimeout(this.messageTimer);
@@ -165,7 +164,7 @@ class ProxyPair {
     return this.flush();
   }
 
-  // websocket --> WebRTC
+  /** websocket --> WebRTC */
   onRelayToClientMessage(event) {
     dbg('websocket --> WebRTC data: ' + event.data.byteLength + ' bytes');
     this.r2cSchedule.push(event.data);
@@ -178,7 +177,7 @@ class ProxyPair {
     return this.close();
   }
 
-  // Close both WebRTC and websocket.
+  /** Close both WebRTC and websocket. */
   close() {
     if (this.timer) {
       clearTimeout(this.timer);
@@ -200,7 +199,7 @@ class ProxyPair {
     this.onCleanup();
   }
 
-  // Send as much data in both directions as the rate limit currently allows.
+  /** Send as much data in both directions as the rate limit currently allows. */
   flush() {
     if (this.flush_timeout_id) {
       clearTimeout(this.flush_timeout_id);

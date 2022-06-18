@@ -1,6 +1,6 @@
 /* global log, dbg, DummyRateLimit, BucketRateLimit, ProxyPair */
 
-/*
+/**
 A JavaScript WebRTC snowflake proxy
 
 Uses WebRTC from the client, and Websocket to the server.
@@ -32,16 +32,20 @@ class Snowflake {
     this.retries = 0;
   }
 
-  // Set the target relay address spec, which is expected to be websocket.
-  // TODO: Should potentially fetch the target from broker later, or modify
-  // entirely for the Tor-independent version.
+  /**
+   * Set the target relay address spec, which is expected to be websocket.
+   * TODO: Should potentially fetch the target from broker later, or modify
+   * entirely for the Tor-independent version.
+   */
   setRelayAddr(relayAddr) {
     this.relayAddr = relayAddr;
     log('Using ' + relayAddr.host + ':' + relayAddr.port + ' as Relay.');
   }
 
-  // Initialize WebRTC PeerConnection, which requires beginning the signalling
-  // process. |pollBroker| automatically arranges signalling.
+  /**
+   * Initialize WebRTC PeerConnection, which requires beginning the signalling
+   * process. `pollBroker` automatically arranges signalling.
+   */
   beginWebRTC() {
     this.pollBroker();
     this.pollTimeoutId = setTimeout((() => {
@@ -49,8 +53,10 @@ class Snowflake {
     }), this.pollInterval);
   }
 
-  // Regularly poll Broker for clients to serve until this snowflake is
-  // serving at capacity, at which point stop polling.
+  /**
+   * Regularly poll Broker for clients to serve until this snowflake is
+   * serving at capacity, at which point stop polling.
+   */
   pollBroker() {
     // Poll broker for clients.
     const pair = this.makeProxyPair();
@@ -110,8 +116,11 @@ class Snowflake {
     this.retries++;
   }
 
-  // Receive an SDP offer from some client assigned by the Broker,
-  // |pair| - an available ProxyPair.
+  /**
+   * Receive an SDP offer from some client assigned by the Broker
+   * @param {ProxyPair} pair an available ProxyPair.
+   * @returns {boolean} `true` on success, `false` on fail.
+   */
   receiveOffer(pair, desc, relayURL) {
     try {
       if (relayURL !== undefined) {
@@ -180,7 +189,7 @@ class Snowflake {
     return pair;
   }
 
-  // Stop all proxypairs.
+  /** Stop all proxypairs. */
   disable() {
     log('Disabling Snowflake.');
     clearTimeout(this.pollTimeoutId);

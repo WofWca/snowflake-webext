@@ -1,7 +1,7 @@
 /* exported Util, Params, DummyRateLimit */
 /* global Config */
 
-/*
+/**
 A JavaScript WebRTC snowflake proxy
 
 Contains helpers for parsing query strings and other utilities.
@@ -21,10 +21,12 @@ class Util {
     return navigator.cookieEnabled;
   }
 
-  // returns a promise that resolves to "restricted" if we
-  // fail to make a test connection to a known restricted
-  // NAT, "unrestricted" if the test connection succeeds, and
-  // "unknown" if we fail to reach the probe test server
+  /**
+   * returns a promise that resolves to "restricted" if we
+   * fail to make a test connection to a known restricted
+   * NAT, "unrestricted" if the test connection succeeds, and
+   * "unknown" if we fail to reach the probe test server
+   */
   static checkNATType(timeout) {
     let pc = new RTCPeerConnection({iceServers: [
       {urls: 'stun:stun1.l.google.com:19302'}
@@ -65,8 +67,10 @@ class Util {
     }));
   }
 
-  // Assumes getClientOffer happened, and a WebRTC SDP answer has been generated.
-  // Sends it back to the broker, which passes it back to the original client.
+  /**
+   * Assumes getClientOffer happened, and a WebRTC SDP answer has been generated.
+   * Sends it back to the broker, which passes it back to the original client.
+   */
   static sendOffer(offer) {
     return new Promise((fulfill, reject) => {
       const xhr = new XMLHttpRequest();
@@ -99,9 +103,11 @@ class Util {
 
 class Parse {
 
-  // Parse a cookie data string (usually document.cookie). The return type is an
-  // object mapping cookies names to values. Returns null on error.
-  // http://www.w3.org/TR/DOM-Level-2-HTML/html.html#ID-8747038
+  /**
+   * Parse a cookie data string (usually document.cookie). The return type is an
+   * object mapping cookies names to values. Returns null on error.
+   * http://www.w3.org/TR/DOM-Level-2-HTML/html.html#ID-8747038
+   */
   static cookie(cookies) {
     const result = {};
     const strings = cookies ? cookies.split(';') : [];
@@ -120,8 +126,10 @@ class Parse {
     return result;
   }
 
-  // Parse an address in the form 'host:port'. Returns an Object with keys 'host'
-  // (String) and 'port' (int). Returns null on error.
+  /**
+   * Parse an address in the form 'host:port'. Returns an Object with keys 'host'
+   * (String) and 'port' (int). Returns null on error.
+   */
   static address(spec) {
     let m = null;
     if (!m) {
@@ -147,8 +155,10 @@ class Parse {
     };
   }
 
-  // Parse a count of bytes. A suffix of 'k', 'm', or 'g' (or uppercase)
-  // does what you would think. Returns null on error.
+  /**
+   * Parse a count of bytes. A suffix of 'k', 'm', or 'g' (or uppercase)
+   * does what you would think. Returns null on error.
+   */
   static byteCount(spec) {
     let matches = spec.match(/^(\d+(?:\.\d*)?)(\w*)$/);
     if (matches === null) {
@@ -172,11 +182,13 @@ class Parse {
     return count * multiplier;
   }
 
-  //Parse a remote connection-address out of the "c=" Connection Data field
-  // or the "a=" attribute fields of the session description.
-  // Return undefined if none is found.
-  // https://tools.ietf.org/html/rfc4566#section-5.7
-  // https://tools.ietf.org/html/rfc5245#section-15
+  /**
+   * Parse a remote connection-address out of the "c=" Connection Data field
+   * or the "a=" attribute fields of the session description.
+   * Return undefined if none is found.
+   * https://tools.ietf.org/html/rfc4566#section-5.7
+   * https://tools.ietf.org/html/rfc5245#section-15
+   */
   static ipFromSDP(sdp) {
     console.log(sdp);
     const ref = [
@@ -195,8 +207,10 @@ class Parse {
     }
   }
 
-  // Parse the mapped port out of an ice candidate returned from the
-  // onicecandidate callback
+  /**
+   * Parse the mapped port out of an ice candidate returned from the
+   * onicecandidate callback
+   */
   static portFromCandidate(c) {
     const pattern = /(?:[\d.]+|[0-9A-Fa-f:.]+) (\d+) typ srflx/m;
     const m = pattern.exec(c);
@@ -206,7 +220,7 @@ class Parse {
     return null;
   }
 
-  // Determine whether an IP address is a local, unspecified, or loopback address
+  /** Determine whether an IP address is a local, unspecified, or loopback address */
   static isRemoteIP(ip) {
     if (ip.includes(":")) {
       var ip6 = ip.split(':');
@@ -249,9 +263,11 @@ class Params {
     return null;
   }
 
-  // Get an object value and parse it as a byte count. Example byte counts are
-  // '100' and '1.3m'. Returns |defaultValue| if param is not a key. Return null
-  // on a parsing error.
+  /**
+   * Get an object value and parse it as a byte count. Example byte counts are
+   * '100' and '1.3m'. Returns |defaultValue| if param is not a key. Return null
+   * on a parsing error.
+   */
   static getByteCount(query, param, defaultValue) {
     if (!query.has(param)) {
       return defaultValue;
@@ -285,7 +301,7 @@ class BucketRateLimit {
     return this.amount <= this.capacity;
   }
 
-  // How many seconds in the future will the limit expire?
+  /** How many seconds in the future will the limit expire? */
   when() {
     this.age();
     return (this.amount - this.capacity) / (this.capacity / this.time);
@@ -303,7 +319,7 @@ BucketRateLimit.prototype.amount = 0.0;
 BucketRateLimit.prototype.lastUpdate = new Date();
 
 
-// A rate limiter that never limits.
+/** A rate limiter that never limits. */
 class DummyRateLimit {
 
   constructor(capacity, time) {
