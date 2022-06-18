@@ -45,7 +45,7 @@ class Snowflake {
   // process. |pollBroker| automatically arranges signalling.
   beginWebRTC() {
     this.pollBroker();
-    return this.pollTimeout = setTimeout((() => {
+    return this.pollTimeoutId = setTimeout((() => {
       return this.beginWebRTC();
     }), this.pollInterval);
   }
@@ -189,7 +189,7 @@ class Snowflake {
   disable() {
     var results;
     log('Disabling Snowflake.');
-    clearTimeout(this.pollTimeout);
+    clearTimeout(this.pollTimeoutId);
     results = [];
     while (this.proxyPairs.length > 0) {
       results.push(this.proxyPairs.pop().close());
