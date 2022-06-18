@@ -52,16 +52,15 @@ class Snowflake {
   // Regularly poll Broker for clients to serve until this snowflake is
   // serving at capacity, at which point stop polling.
   pollBroker() {
-    var msg, pair, recv;
     // Poll broker for clients.
-    pair = this.makeProxyPair();
+    const pair = this.makeProxyPair();
     if (!pair) {
       log('At client capacity.');
       return;
     }
     log('Polling broker..');
     // Do nothing until a new proxyPair is available.
-    msg = 'Polling for client ... ';
+    let msg = 'Polling for client ... ';
     if (this.retries > 0) {
       msg += '[retries: ' + this.retries + ']';
     }
@@ -69,7 +68,7 @@ class Snowflake {
     //update NAT type
     console.log("NAT type: " + this.ui.natType);
     this.broker.setNATType(this.ui.natType);
-    recv = this.broker.getClientOffer(pair.id, this.proxyPairs.length);
+    const recv = this.broker.getClientOffer(pair.id, this.proxyPairs.length);
     recv.then((resp) => {
       var clientNAT = resp.NAT;
       if (!this.receiveOffer(pair, resp.Offer, resp.RelayURL)) {
@@ -114,13 +113,11 @@ class Snowflake {
   // Receive an SDP offer from some client assigned by the Broker,
   // |pair| - an available ProxyPair.
   receiveOffer(pair, desc, relayURL) {
-    var e, offer, sdp;
-
     try {
       if (relayURL !== undefined) {
-        let relayURLParsed = new URL(relayURL);
-        let hostname = relayURLParsed.hostname;
-        let protocol = relayURLParsed.protocol;
+        const relayURLParsed = new URL(relayURL);
+        const hostname = relayURLParsed.hostname;
+        const protocol = relayURLParsed.protocol;
         if (protocol !== "wss:") {
           log('incorrect relay url protocol');
           return false;
@@ -131,29 +128,27 @@ class Snowflake {
         }
         pair.setRelayURL(relayURL);
       }
-      offer = JSON.parse(desc);
+      const offer = JSON.parse(desc);
       dbg('Received:\n\n' + offer.sdp + '\n');
-      sdp = new RTCSessionDescription(offer);
+      const sdp = new RTCSessionDescription(offer);
       if (pair.receiveWebRTCOffer(sdp)) {
         this.sendAnswer(pair);
         return true;
       } else {
         return false;
       }
-    } catch (error) {
-      e = error;
+    } catch (e) {
       log('ERROR: Unable to receive Offer: ' + e);
       return false;
     }
   }
 
   sendAnswer(pair) {
-    var fail, next;
-    next = function (sdp) {
+    const next = function (sdp) {
       dbg('webrtc: Answer ready.');
       pair.pc.setLocalDescription(sdp).catch(fail);
     };
-    fail = function () {
+    const fail = function () {
       pair.close();
       dbg('webrtc: Failed to create or set Answer');
     };
@@ -167,8 +162,7 @@ class Snowflake {
     if (this.proxyPairs.length >= this.config.maxNumClients) {
       return null;
     }
-    var pair;
-    pair = new ProxyPair(this.relayAddr, this.rateLimit, this.config);
+    const pair = new ProxyPair(this.relayAddr, this.rateLimit, this.config);
     this.proxyPairs.push(pair);
 
     log('Snowflake IDs: ' + (this.proxyPairs.map(function (p) {
@@ -176,9 +170,8 @@ class Snowflake {
     })).join(' | '));
 
     pair.onCleanup = () => {
-      var ind;
       // Delete from the list of proxy pairs.
-      ind = this.proxyPairs.indexOf(pair);
+      const ind = this.proxyPairs.indexOf(pair);
       if (ind > -1) {
         this.proxyPairs.splice(ind, 1);
       }

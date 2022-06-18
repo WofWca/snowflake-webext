@@ -47,8 +47,7 @@ class ProxyPair {
     };
     // OnDataChannel triggered remotely from the client when connection succeeds.
     return this.pc.ondatachannel = (dc) => {
-      var channel;
-      channel = dc.channel;
+      const channel = dc.channel;
       dbg('Data Channel established...');
       this.prepareDataChannel(channel);
       return this.client = channel;
@@ -99,7 +98,6 @@ class ProxyPair {
 
   // Assumes WebRTC datachannel is connected.
   connectRelay() {
-    var params, peer_ip, ref;
     dbg('Connecting to relay...');
     // Get a remote IP address from the PeerConnection, if possible. Add it to
     // the WebSocket URL's query string if available.
@@ -108,8 +106,9 @@ class ProxyPair {
     // are not marked experimental, were undefined when I tried them in Firefox
     // 52.2.0.
     // https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/remoteDescription
-    peer_ip = Parse.ipFromSDP((ref = this.pc.remoteDescription) != null ? ref.sdp : void 0);
-    params = [];
+    const desc = this.pc.remoteDescription;
+    const peer_ip = Parse.ipFromSDP(desc!= null ? desc.sdp : undefined);
+    const params = [];
     if (peer_ip != null) {
       params.push(["client_ip", peer_ip]);
     }
@@ -174,8 +173,7 @@ class ProxyPair {
   }
 
   onError(event) {
-    var ws;
-    ws = event.target;
+    const ws = event.target;
     log(ws.label + ' error.');
     return this.close();
   }
@@ -204,25 +202,23 @@ class ProxyPair {
 
   // Send as much data in both directions as the rate limit currently allows.
   flush() {
-    var busy, checkChunks;
     if (this.flush_timeout_id) {
       clearTimeout(this.flush_timeout_id);
     }
     this.flush_timeout_id = null;
-    busy = true;
-    checkChunks = () => {
-      var chunk;
+    let busy = true;
+    const checkChunks = () => {
       busy = false;
       // WebRTC --> websocket
       if (this.relayIsReady() && this.relay.bufferedAmount < this.MAX_BUFFER && this.c2rSchedule.length > 0) {
-        chunk = this.c2rSchedule.shift();
+        const chunk = this.c2rSchedule.shift();
         this.rateLimit.update(chunk.byteLength);
         this.relay.send(chunk);
         busy = true;
       }
       // websocket --> WebRTC
       if (this.webrtcIsReady() && this.client.bufferedAmount < this.MAX_BUFFER && this.r2cSchedule.length > 0) {
-        chunk = this.r2cSchedule.shift();
+        const chunk = this.r2cSchedule.shift();
         this.rateLimit.update(chunk.byteLength);
         this.client.send(chunk);
         return busy = true;

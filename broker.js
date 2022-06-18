@@ -41,8 +41,7 @@ class Broker {
   // TODO: Actually support multiple clients.
   getClientOffer(id, numClientsConnected) {
     return new Promise((fulfill, reject) => {
-      var xhr;
-      xhr = new XMLHttpRequest();
+      const xhr = new XMLHttpRequest();
       xhr.onreadystatechange = function() {
         if (xhr.DONE !== xhr.readyState) {
           return;
@@ -81,10 +80,9 @@ class Broker {
   // Assumes getClientOffer happened, and a WebRTC SDP answer has been generated.
   // Sends it back to the broker, which passes it to back to the original client.
   sendAnswer(id, answer) {
-    var xhr;
     dbg(id + ' - Sending answer back to broker...\n');
     dbg(answer.sdp);
-    xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
       if (xhr.DONE !== xhr.readyState) {
         return;
@@ -109,11 +107,9 @@ class Broker {
   // urlSuffix for the broker is different depending on what action
   // is desired.
   _postRequest(xhr, urlSuffix, payload) {
-    var err;
     try {
       xhr.open('POST', this.url + urlSuffix);
-    } catch (error) {
-      err = error;
+    } catch (err) {
       /*
       An exception happens here when, for example, NoScript allows the domain
       on which the proxy badge runs, but not the domain to which it's trying
