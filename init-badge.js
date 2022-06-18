@@ -50,7 +50,7 @@ class BadgeUI extends UI {
   initNATType() {
     this.natType = "unknown";
     this.checkNAT();
-    return setInterval(() => {this.checkNAT();}, config.natCheckInterval);
+    setInterval(() => {this.checkNAT();}, config.natCheckInterval);
   }
 
   setStatus() {}
@@ -139,7 +139,9 @@ var debug, snowflake, config, broker, ui, log, dbg, init, update, silenceNotific
   // log to console.
   log = function(msg) {
     console.log('Snowflake: ' + msg);
-    return snowflake != null ? snowflake.ui.log(msg) : void 0;
+    if (snowflake != null) {
+      snowflake.ui.log(msg);
+    }
   };
 
   dbg = function(msg) {

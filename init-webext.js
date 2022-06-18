@@ -27,7 +27,7 @@ class WebExtUI extends UI {
   initNATType() {
     this.natType = "unknown";
     this.checkNAT();
-    return setInterval(() => {this.checkNAT();}, config.natCheckInterval);
+    setInterval(() => {this.checkNAT();}, config.natCheckInterval);
   }
 
   tryProbe() {
@@ -164,12 +164,14 @@ var debug, snowflake, config, broker, ui, log, dbg, init, update, silenceNotific
   // log to console.
   log = function(msg) {
     console.log('Snowflake: ' + msg);
-    return snowflake != null ? snowflake.ui.log(msg) : void 0;
+    if (snowflake != null) {
+      snowflake.ui.log(msg);
+    }
   };
 
   dbg = function(msg) {
     if (debug) {
-      return log(msg);
+      log(msg);
     }
   };
 
@@ -194,7 +196,7 @@ var debug, snowflake, config, broker, ui, log, dbg, init, update, silenceNotific
     dbg('Contacting Broker at ' + broker.url);
     log('Starting snowflake');
     snowflake.setRelayAddr(config.relayAddr);
-    return snowflake.beginWebRTC();
+    snowflake.beginWebRTC();
   };
 
   window.onunload = function() {

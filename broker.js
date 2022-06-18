@@ -77,7 +77,7 @@ class Broker {
         Clients: clients,
         AcceptedRelayPattern: this.config.allowedRelayPattern,
       };
-      return this._postRequest(xhr, 'proxy', JSON.stringify(data));
+      this._postRequest(xhr, 'proxy', JSON.stringify(data));
     });
   }
 
@@ -96,14 +96,16 @@ class Broker {
       switch (xhr.status) {
         case Broker.CODE.OK:
           dbg('Broker: Successfully replied with answer.');
-          return dbg(xhr.responseText);
+          dbg(xhr.responseText);
+          break;
         default:
           dbg('Broker ERROR: Unexpected ' + xhr.status + ' - ' + xhr.statusText);
-          return snowflake.ui.setStatus(' failure. Please refresh.');
+          snowflake.ui.setStatus(' failure. Please refresh.');
+          break;
       }
     };
     var data = {"Version": "1.0", "Sid": id, "Answer": JSON.stringify(answer)};
-    return this._postRequest(xhr, 'answer', JSON.stringify(data));
+    this._postRequest(xhr, 'answer', JSON.stringify(data));
   }
 
   setNATType(natType) {
@@ -127,7 +129,7 @@ class Broker {
       log('Broker: exception while connecting: ' + err.message);
       return;
     }
-    return xhr.send(payload);
+    xhr.send(payload);
   }
 
 }

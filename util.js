@@ -95,7 +95,7 @@ class Util {
         console.log('Signaling Server: exception while connecting: ' + error.message);
         return reject('unable to connect to signaling server');
       }
-      return xhr.send(JSON.stringify(data));
+      xhr.send(JSON.stringify(data));
     });
   }
 }
@@ -291,7 +291,7 @@ class BucketRateLimit {
     this.lastUpdate = now;
     this.amount -= delta * this.capacity / this.time;
     if (this.amount < 0.0) {
-      return this.amount = 0.0;
+      this.amount = 0.0;
     }
   }
 

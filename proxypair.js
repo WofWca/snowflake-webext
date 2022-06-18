@@ -45,11 +45,11 @@ class ProxyPair {
       }
     };
     // OnDataChannel triggered remotely from the client when connection succeeds.
-    return this.pc.ondatachannel = (dc) => {
+    this.pc.ondatachannel = (dc) => {
       const channel = dc.channel;
       dbg('Data Channel established...');
       this.prepareDataChannel(channel);
-      return this.client = channel;
+      this.client = channel;
     };
   }
 
@@ -76,7 +76,7 @@ class ProxyPair {
       this.counted = true;
       // This is the point when the WebRTC datachannel is done, so the next step
       // is to establish websocket to the server.
-      return this.connectRelay();
+      this.connectRelay();
     };
     channel.onclose = () => {
       log('WebRTC DataChannel closed.');
@@ -86,13 +86,13 @@ class ProxyPair {
         this.counted = false;
       }
       this.flush();
-      return this.close();
+      this.close();
     };
     channel.onerror = function () {
-      return log('Data channel error!');
+      log('Data channel error!');
     };
     channel.binaryType = "arraybuffer";
-    return channel.onmessage = this.onClientToRelayMessage;
+    channel.onmessage = this.onClientToRelayMessage;
   }
 
   /** Assumes WebRTC datachannel is connected. */
@@ -122,7 +122,7 @@ class ProxyPair {
         this.timer = 0;
       }
       log(relay.label + ' connected!');
-      return snowflake.ui.setStatus('connected');
+      snowflake.ui.setStatus('connected');
     };
     this.relay.onclose = () => {
       log(relay.label + ' closed.');
@@ -132,17 +132,17 @@ class ProxyPair {
         this.counted = false;
       }
       this.flush();
-      return this.close();
+      this.close();
     };
     this.relay.onerror = this.onError;
     this.relay.onmessage = this.onRelayToClientMessage;
     // TODO: Better websocket timeout handling.
-    return this.timer = setTimeout((() => {
+    this.timer = setTimeout((() => {
       if (0 === this.timer) {
         return;
       }
       log(relay.label + ' timed out connecting.');
-      return relay.onclose();
+      relay.onclose();
     }), 5000);
   }
 
@@ -161,20 +161,20 @@ class ProxyPair {
       this.flush();
       this.close();
     }), this.config.messageTimeout);
-    return this.flush();
+    this.flush();
   }
 
   /** websocket --> WebRTC */
   onRelayToClientMessage(event) {
     dbg('websocket --> WebRTC data: ' + event.data.byteLength + ' bytes');
     this.r2cSchedule.push(event.data);
-    return this.flush();
+    this.flush();
   }
 
   onError(event) {
     const ws = event.target;
     log(ws.label + ' error.');
-    return this.close();
+    this.close();
   }
 
   /** Close both WebRTC and websocket. */
@@ -220,14 +220,14 @@ class ProxyPair {
         const chunk = this.r2cSchedule.shift();
         this.rateLimit.update(chunk.byteLength);
         this.client.send(chunk);
-        return busy = true;
+        busy = true;
       }
     };
     while (busy && !this.rateLimit.isLimited()) {
       checkChunks();
     }
     if (this.r2cSchedule.length > 0 || this.c2rSchedule.length > 0 || (this.relayIsReady() && this.relay.bufferedAmount > 0) || (this.webrtcIsReady() && this.client.bufferedAmount > 0)) {
-      return this.flush_timeout_id = setTimeout(this.flush, this.rateLimit.when() * 1000);
+      this.flush_timeout_id = setTimeout(this.flush, this.rateLimit.when() * 1000);
     }
   }
 
