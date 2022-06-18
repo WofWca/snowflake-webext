@@ -174,9 +174,7 @@ class Snowflake {
     const pair = new ProxyPair(this.relayAddr, this.rateLimit, this.config);
     this.proxyPairs.push(pair);
 
-    log('Snowflake IDs: ' + (this.proxyPairs.map(function (p) {
-      return p.id;
-    })).join(' | '));
+    log('Snowflake IDs: ' + (this.proxyPairs.map(p => p.id)).join(' | '));
 
     pair.onCleanup = () => {
       // Delete from the list of proxy pairs.

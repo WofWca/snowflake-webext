@@ -77,9 +77,7 @@ class WebExtUI extends UI {
     if (!this.port) { return; }
     this.port.postMessage({
       clients: this.clients,
-      total: this.stats.reduce((function(t, c) {
-        return t + c;
-      }), 0),
+      total: this.stats.reduce((t, c) => t + c, 0),
       enabled: this.enabled,
       missingFeature: this.missingFeature,
     });
