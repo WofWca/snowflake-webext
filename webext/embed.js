@@ -13,7 +13,16 @@ window.onload = () => {
   const popup = new Popup(
     (...args) => chrome.i18n.getMessage(...args),
     (event) => port.postMessage({ enabled: event.target.checked }),
-    () => port.postMessage({ retry: true })
+    () => port.postMessage({ retry: true }),
+    (
+      (
+        typeof SUPPORTS_WEBEXT_OPTIONAL_BACKGROUND_PERMISSION !== 'undefined'
+        // eslint-disable-next-line no-undef
+        && SUPPORTS_WEBEXT_OPTIONAL_BACKGROUND_PERMISSION
+      )
+        ? (newValue) => port.postMessage({ runInBackground: newValue })
+        : undefined
+    )
   );
 
   port.onMessage.addListener((m) => {

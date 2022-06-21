@@ -11,7 +11,10 @@ function setClass(elem, className, cond) {
 }
 
 class Popup {
-  constructor(getMsgFunc, changeFunc, retryFunc) {
+  /**
+   * @param {() => void} [onRunInBackgroundChange]
+   */
+  constructor(getMsgFunc, changeFunc, retryFunc, onRunInBackgroundChange) {
     this.getMsgFunc = getMsgFunc;
     this.enabled = document.getElementById('enabled');
     this.enabled.addEventListener('change', changeFunc);
@@ -34,26 +37,27 @@ class Popup {
       /** @type {HTMLInputElement} */
       const runInBackgroundInput = document.getElementById('run-in-background');
       document.getElementById('run-in-background-wrapper').classList.remove('display-none');
-      {
-        // Two-way bind the input to the permission.
-        new Promise(r => chrome.permissions.contains({ permissions: ['background'] }, r))
-        .then(contains => runInBackgroundInput.checked = contains);
-        chrome.permissions.onAdded.addListener(({ permissions }) => {
-          if (permissions.includes('background')) {
-            runInBackgroundInput.checked = true;
-          }
+      { // Two-way bind the input to the permission.
+        runInBackgroundInput.addEventListener('change', ({ target }) => {
+          onRunInBackgroundChange(target.checked);
+          // The permission request may be rejected, so only update the checkbox value inside
+          // the event listeners below. TODO Don't know if it's ok in terms of accessibility.
+          // Also maybe it's better looking in general to toggle the checkbox and toggle it back
+          // if the request is rejected.
+          target.checked = !target.checked;
         });
-        chrome.permissions.onRemoved.addListener(({ permissions }) => {
-          if (permissions.includes('background')) {
-            runInBackgroundInput.checked = false;
-          }
+
+        // The storage is the source of truth for `runInBackground`, not
+        // `chrome.permissions.contains({ permissions: ['background'] }`, because when the "Enabled"
+        // checkbox is off, we (may) revoke that permission.
+        new Promise(r => chrome.storage.local.get({ runInBackground: false }, r))
+        .then(({ runInBackground }) => {
+          runInBackgroundInput.checked = runInBackground;
         });
-        runInBackgroundInput.addEventListener('change', event => {
-          if (event.target.checked) {
-            new Promise(r => chrome.permissions.request({ permissions: ['background'] }, r))
-            .then(granted => event.target.checked = granted);
-          } else {
-            chrome.permissions.remove({ permissions: ['background'] });
+        chrome.storage.local.onChanged.addListener(changes => {
+          const runInBackgroundChange = changes.runInBackground;
+          if (runInBackgroundChange) {
+            runInBackgroundInput.checked = runInBackgroundChange.newValue;
           }
         });
       }

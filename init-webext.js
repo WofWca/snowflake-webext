@@ -5,6 +5,40 @@
 UI
 */
 
+
+/**
+ * Decide whether we need to request or revoke the 'background' permission, and
+ * set the `runInBackground` storage value appropriately.
+ * @param {boolean | undefined} enabledSetting
+ * @param {boolean | undefined} runInBackgroundSetting
+ */
+function maybeChangeBackgroundPermission(enabledSetting, runInBackgroundSetting) {
+  const needBackgroundPermission =
+    runInBackgroundSetting
+    // When the extension is disabled, we need the permission to be revoked because
+    // otherwise it'll keep the browser process running for no reason.
+    && enabledSetting;
+  // Yes, this is called even if the permission is already in the state we need
+  // it to be in (granted/removed).
+  new Promise(r => {
+    chrome.permissions[needBackgroundPermission ? "request" : "remove"](
+      { permissions: ['background'] },
+      r
+    );
+  })
+  .then(success => {
+    // Currently the resolve value is `true` even when the permission was alrady granted
+    // before it was requested (already removed before it was revoked). TODO Need to make
+    // sure it's the desired behavior and if it needs to change.
+    // https://developer.chrome.com/docs/extensions/reference/permissions/#method-remove
+    // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/permissions/remove#return_value
+    // https://github.com/mdn/content/pull/17516
+    if (success) {
+      chrome.storage.local.set({ runInBackground: runInBackgroundSetting });
+    }
+  });
+}
+
 class WebExtUI extends UI {
 
   constructor() {
@@ -94,15 +128,38 @@ class WebExtUI extends UI {
     if (m.retry) {
       // FIXME: Can set a retrying state here
       this.tryProbe();
-      return;
+    } else if (m.enabled != undefined) {
+      (new Promise((resolve) => {
+        chrome.storage.local.set({ "snowflake-enabled": m.enabled }, resolve);
+      }))
+      .then(() => {
+        log("Stored toggle state");
+        this.initToggle();
+      });
+      if (
+        typeof SUPPORTS_WEBEXT_OPTIONAL_BACKGROUND_PERMISSION !== 'undefined'
+        // eslint-disable-next-line no-undef
+        && SUPPORTS_WEBEXT_OPTIONAL_BACKGROUND_PERMISSION
+      ) {
+        new Promise(r => chrome.storage.local.get({ runInBackground: false }, r))
+        .then(storage => {
+          maybeChangeBackgroundPermission(m.enabled, storage.runInBackground);
+        });
+      }
+    } else if (m.runInBackground != undefined) {
+      if (
+        typeof SUPPORTS_WEBEXT_OPTIONAL_BACKGROUND_PERMISSION !== 'undefined'
+        // eslint-disable-next-line no-undef
+        && SUPPORTS_WEBEXT_OPTIONAL_BACKGROUND_PERMISSION
+      ) {
+        new Promise(r => chrome.storage.local.get({ "snowflake-enabled": false }, r))
+        .then(storage => {
+          maybeChangeBackgroundPermission(storage["snowflake-enabled"], m.runInBackground);
+        });
+      }
+    } else {
+      log("Unrecognized message");
     }
-    (new Promise((resolve) => {
-      chrome.storage.local.set({ "snowflake-enabled": m.enabled }, resolve);
-    }))
-    .then(() => {
-      log("Stored toggle state");
-      this.initToggle();
-    });
   }
 
   onDisconnect() {

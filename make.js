@@ -174,9 +174,6 @@ function buildWebext(browserEngine) {
   execSync(`rm -rf ${outDir} && mkdir ${outDir}`);
   execSync(`cp -r webext/. ${outDir}/`);
   execSync(`cp -r ${STATIC}/{${SHARED_FILES.join(',')}} ${outDir}/`, { shell: '/bin/bash' });
-  for (const [key, value] of Object.entries(definitions)) {
-    execSync(`sed -i "s/${key}/${value}/g" ${outDir}/popup.js`);
-  }
   {
     const manfestBasePath = `${outDir}/manifest_base.json`;
     const manifest = JSON.parse(readFileSync(manfestBasePath, 'utf-8'));
@@ -192,6 +189,12 @@ function buildWebext(browserEngine) {
   }
   copyTranslations(outDir);
   concatJS(outDir, 'webext', 'snowflake.js', '');
+  for (const [key, value] of Object.entries(definitions)) {
+    const commandStart = `sed -i "s/${key}/${value}/g" ${outDir}`;
+    execSync(`${commandStart}/popup.js`);
+    execSync(`${commandStart}/embed.js`);
+    execSync(`${commandStart}/snowflake.js`);
+  }
   console.log('Webextension prepared.');
 }
 task('webext', 'build the webextension', function() {
