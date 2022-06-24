@@ -24,7 +24,7 @@ class Snowflake {
     this.proxyPairs = [];
     this.natFailures = 0;
     this.pollInterval = this.config.defaultBrokerPollInterval;
-    if (void 0 === this.config.rateLimitBytes) {
+    if (undefined === this.config.rateLimitBytes) {
       this.rateLimit = new DummyRateLimit();
     } else {
       this.rateLimit = new BucketRateLimit(this.config.rateLimitBytes * this.config.rateLimitHistory, this.config.rateLimitHistory);

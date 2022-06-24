@@ -52,7 +52,7 @@ class WebExtUI extends UI {
     }))
     .then((result) => {
       let enabled = this.enabled;
-      if (result['snowflake-enabled'] !== void 0) {
+      if (result['snowflake-enabled'] !== undefined) {
         enabled = result['snowflake-enabled'];
       } else {
         log("Toggle state not yet saved");

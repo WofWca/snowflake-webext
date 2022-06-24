@@ -240,7 +240,7 @@ class ProxyPair {
   }
 
   isClosed(ws) {
-    return void 0 === ws || WebSocket.CLOSED === ws.readyState;
+    return undefined === ws || WebSocket.CLOSED === ws.readyState;
   }
 
   peerConnOpen() {

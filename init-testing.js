@@ -72,11 +72,11 @@ var snowflake, query, debug, ui, silenceNotifications, log, dbg, init;
   // log to console.
   log = function(msg) {
     console.log('Snowflake: ' + msg);
-    return snowflake != null ? snowflake.ui.log(msg) : void 0;
+    return snowflake != null ? snowflake.ui.log(msg) : undefined;
   };
 
   dbg = function(msg) {
-    if (debug || ((snowflake != null ? snowflake.ui : void 0) instanceof DebugUI)) {
+    if (debug || ((snowflake != null ? snowflake.ui : undefined) instanceof DebugUI)) {
       return log(msg);
     }
   };

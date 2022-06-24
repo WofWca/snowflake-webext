@@ -4,7 +4,7 @@
 WebRTC shims for multiple browsers.
 */
 
-if (typeof module !== "undefined" && module !== null ? module.exports : void 0) {
+if (typeof module !== "undefined" && module !== null ? module.exports : undefined) {
   window = {};
   document = {
     getElementById: function() {
