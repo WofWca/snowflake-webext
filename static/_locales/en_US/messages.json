@@ -5,6 +5,9 @@
   "popupEnabled": {
     "message": "Enabled"
   },
+  "popupRunInBackground": {
+    "message": "Keep running when the browser is closed"
+  },
   "popupLearnMore": {
     "message": "Learn more"
   },
