@@ -38,15 +38,14 @@ class Snowflake {
   setRelayAddr(relayAddr) {
     this.relayAddr = relayAddr;
     log('Using ' + relayAddr.host + ':' + relayAddr.port + ' as Relay.');
-    return true;
   }
 
   // Initialize WebRTC PeerConnection, which requires beginning the signalling
   // process. |pollBroker| automatically arranges signalling.
   beginWebRTC() {
     this.pollBroker();
-    return this.pollTimeoutId = setTimeout((() => {
-      return this.beginWebRTC();
+    this.pollTimeoutId = setTimeout((() => {
+      this.beginWebRTC();
     }), this.pollInterval);
   }
 
@@ -74,10 +73,11 @@ class Snowflake {
     recv.then((resp) => {
       var clientNAT = resp.NAT;
       if (!this.receiveOffer(pair, resp.Offer, resp.RelayURL)) {
-        return pair.close();
+        pair.close();
+        return;
       }
       //set a timeout for channel creation
-      return setTimeout((() => {
+      setTimeout((() => {
         if (!pair.webrtcIsReady()) {
           log('proxypair datachannel timed out waiting for open');
           pair.close();
@@ -103,13 +103,12 @@ class Snowflake {
               this.config.defaultBrokerPollInterval);
           this.natFailures = 0;
         }
-        return;
       }), this.config.datachannelTimeout);
     }, function () {
       //on error, close proxy pair
-      return pair.close();
+      pair.close();
     });
-    return this.retries++;
+    this.retries++;
   }
 
   // Receive an SDP offer from some client assigned by the Broker,
@@ -152,15 +151,18 @@ class Snowflake {
     var fail, next;
     next = function (sdp) {
       dbg('webrtc: Answer ready.');
-      return pair.pc.setLocalDescription(sdp).catch(fail);
+      pair.pc.setLocalDescription(sdp).catch(fail);
     };
     fail = function () {
       pair.close();
-      return dbg('webrtc: Failed to create or set Answer');
+      dbg('webrtc: Failed to create or set Answer');
     };
-    return pair.pc.createAnswer().then(next).catch(fail);
+    pair.pc.createAnswer().then(next).catch(fail);
   }
 
+  /**
+   * @returns {null | ProxyPair}
+   */
   makeProxyPair() {
     if (this.proxyPairs.length >= this.config.maxNumClients) {
       return null;
@@ -178,7 +180,7 @@ class Snowflake {
       // Delete from the list of proxy pairs.
       ind = this.proxyPairs.indexOf(pair);
       if (ind > -1) {
-        return this.proxyPairs.splice(ind, 1);
+        this.proxyPairs.splice(ind, 1);
       }
     };
     pair.begin();
@@ -187,14 +189,11 @@ class Snowflake {
 
   // Stop all proxypairs.
   disable() {
-    var results;
     log('Disabling Snowflake.');
     clearTimeout(this.pollTimeoutId);
-    results = [];
     while (this.proxyPairs.length > 0) {
-      results.push(this.proxyPairs.pop().close());
+      this.proxyPairs.pop().close();
     }
-    return results;
   }
 
   /**
