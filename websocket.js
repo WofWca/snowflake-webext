@@ -4,8 +4,10 @@ Only websocket-specific stuff.
 
 class WS {
 
-  // Build an escaped URL string from unescaped components. Only scheme and host
-  // are required. See RFC 3986, section 3.
+  /**
+   * Build an escaped URL string from unescaped components. Only scheme and host
+   * are required. See RFC 3986, section 3.
+   */
   static buildUrl(scheme, host, port, path, params) {
     var parts;
     parts = [];
@@ -19,11 +21,11 @@ class WS {
     } else {
       parts.push(encodeURIComponent(host));
     }
-    if (void 0 !== port && this.DEFAULT_PORTS[scheme] !== port) {
+    if (undefined !== port && this.DEFAULT_PORTS[scheme] !== port) {
       parts.push(':');
       parts.push(encodeURIComponent(port.toString()));
     }
-    if (void 0 !== path && '' !== path) {
+    if (undefined !== path && '' !== path) {
       if (!path.match(/^\//)) {
         path = '/' + path;
       }
@@ -32,7 +34,7 @@ class WS {
       });
       parts.push(path);
     }
-    if (void 0 !== params) {
+    if (undefined !== params) {
       parts.push('?');
       parts.push(new URLSearchParams(params).toString());
     }

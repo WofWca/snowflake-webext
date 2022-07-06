@@ -18,7 +18,7 @@ Config.prototype.relayAddr = {
 Config.prototype.cookieName = "snowflake-allow";
 
 // Bytes per second. Set to undefined to disable limit.
-Config.prototype.rateLimitBytes = void 0;
+Config.prototype.rateLimitBytes = undefined;
 
 Config.prototype.minRateLimit = 10 * 1024;
 

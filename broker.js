@@ -1,6 +1,6 @@
 /* global log, dbg, snowflake */
 
-/*
+/**
 Communication with the snowflake broker.
 
 Browser snowflakes must register with the broker in order
@@ -10,10 +10,12 @@ to get assigned to clients.
 // Represents a broker running remotely.
 class Broker {
 
-  // When interacting with the Broker, snowflake must generate a unique session
-  // ID so the Broker can keep track of each proxy's signalling channels.
-  // On construction, this Broker object does not do anything until
-  // |getClientOffer| is called.
+  /**
+   * When interacting with the Broker, snowflake must generate a unique session
+   * ID so the Broker can keep track of each proxy's signalling channels.
+   * On construction, this Broker object does not do anything until
+   * `getClientOffer` is called.
+   */
   constructor(config) {
     this.getClientOffer = this.getClientOffer.bind(this);
     this._postRequest = this._postRequest.bind(this);
@@ -34,15 +36,16 @@ class Broker {
     }
   }
 
-  // Promises some client SDP Offer.
-  // Registers this Snowflake with the broker using an HTTP POST request, and
-  // waits for a response containing some client offer that the Broker chooses
-  // for this proxy..
-  // TODO: Actually support multiple clients.
+  /**
+   * Promises some client SDP Offer.
+   * Registers this Snowflake with the broker using an HTTP POST request, and
+   * waits for a response containing some client offer that the Broker chooses
+   * for this proxy..
+   * TODO: Actually support multiple clients.
+   */
   getClientOffer(id, numClientsConnected) {
     return new Promise((fulfill, reject) => {
-      var xhr;
-      xhr = new XMLHttpRequest();
+      const xhr = new XMLHttpRequest();
       xhr.onreadystatechange = function() {
         if (xhr.DONE !== xhr.readyState) {
           return;
@@ -74,17 +77,18 @@ class Broker {
         Clients: clients,
         AcceptedRelayPattern: this.config.allowedRelayPattern,
       };
-      return this._postRequest(xhr, 'proxy', JSON.stringify(data));
+      this._postRequest(xhr, 'proxy', JSON.stringify(data));
     });
   }
 
-  // Assumes getClientOffer happened, and a WebRTC SDP answer has been generated.
-  // Sends it back to the broker, which passes it to back to the original client.
+  /**
+   * Assumes getClientOffer happened, and a WebRTC SDP answer has been generated.
+   * Sends it back to the broker, which passes it to back to the original client.
+   */
   sendAnswer(id, answer) {
-    var xhr;
     dbg(id + ' - Sending answer back to broker...\n');
     dbg(answer.sdp);
-    xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function() {
       if (xhr.DONE !== xhr.readyState) {
         return;
@@ -92,28 +96,30 @@ class Broker {
       switch (xhr.status) {
         case Broker.CODE.OK:
           dbg('Broker: Successfully replied with answer.');
-          return dbg(xhr.responseText);
+          dbg(xhr.responseText);
+          break;
         default:
           dbg('Broker ERROR: Unexpected ' + xhr.status + ' - ' + xhr.statusText);
-          return snowflake.ui.setStatus(' failure. Please refresh.');
+          snowflake.ui.setStatus(' failure. Please refresh.');
+          break;
       }
     };
     var data = {"Version": "1.0", "Sid": id, "Answer": JSON.stringify(answer)};
-    return this._postRequest(xhr, 'answer', JSON.stringify(data));
+    this._postRequest(xhr, 'answer', JSON.stringify(data));
   }
 
   setNATType(natType) {
     this.natType = natType;
   }
 
-  // urlSuffix for the broker is different depending on what action
-  // is desired.
+  /**
+   * urlSuffix for the broker is different depending on what action
+   * is desired.
+   */
   _postRequest(xhr, urlSuffix, payload) {
-    var err;
     try {
       xhr.open('POST', this.url + urlSuffix);
-    } catch (error) {
-      err = error;
+    } catch (err) {
       /*
       An exception happens here when, for example, NoScript allows the domain
       on which the proxy badge runs, but not the domain to which it's trying
@@ -123,7 +129,7 @@ class Broker {
       log('Broker: exception while connecting: ' + err.message);
       return;
     }
-    return xhr.send(payload);
+    xhr.send(payload);
   }
 
 }

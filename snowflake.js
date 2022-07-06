@@ -1,6 +1,6 @@
 /* global log, dbg, DummyRateLimit, BucketRateLimit, ProxyPair */
 
-/*
+/**
 A JavaScript WebRTC snowflake proxy
 
 Uses WebRTC from the client, and Websocket to the server.
@@ -24,7 +24,7 @@ class Snowflake {
     this.proxyPairs = [];
     this.natFailures = 0;
     this.pollInterval = this.config.defaultBrokerPollInterval;
-    if (void 0 === this.config.rateLimitBytes) {
+    if (undefined === this.config.rateLimitBytes) {
       this.rateLimit = new DummyRateLimit();
     } else {
       this.rateLimit = new BucketRateLimit(this.config.rateLimitBytes * this.config.rateLimitHistory, this.config.rateLimitHistory);
@@ -32,37 +32,41 @@ class Snowflake {
     this.retries = 0;
   }
 
-  // Set the target relay address spec, which is expected to be websocket.
-  // TODO: Should potentially fetch the target from broker later, or modify
-  // entirely for the Tor-independent version.
+  /**
+   * Set the target relay address spec, which is expected to be websocket.
+   * TODO: Should potentially fetch the target from broker later, or modify
+   * entirely for the Tor-independent version.
+   */
   setRelayAddr(relayAddr) {
     this.relayAddr = relayAddr;
     log('Using ' + relayAddr.host + ':' + relayAddr.port + ' as Relay.');
-    return true;
   }
 
-  // Initialize WebRTC PeerConnection, which requires beginning the signalling
-  // process. |pollBroker| automatically arranges signalling.
+  /**
+   * Initialize WebRTC PeerConnection, which requires beginning the signalling
+   * process. `pollBroker` automatically arranges signalling.
+   */
   beginWebRTC() {
     this.pollBroker();
-    return this.pollTimeout = setTimeout((() => {
-      return this.beginWebRTC();
+    this.pollTimeoutId = setTimeout((() => {
+      this.beginWebRTC();
     }), this.pollInterval);
   }
 
-  // Regularly poll Broker for clients to serve until this snowflake is
-  // serving at capacity, at which point stop polling.
+  /**
+   * Regularly poll Broker for clients to serve until this snowflake is
+   * serving at capacity, at which point stop polling.
+   */
   pollBroker() {
-    var msg, pair, recv;
     // Poll broker for clients.
-    pair = this.makeProxyPair();
+    const pair = this.makeProxyPair();
     if (!pair) {
       log('At client capacity.');
       return;
     }
     log('Polling broker..');
     // Do nothing until a new proxyPair is available.
-    msg = 'Polling for client ... ';
+    let msg = 'Polling for client ... ';
     if (this.retries > 0) {
       msg += '[retries: ' + this.retries + ']';
     }
@@ -70,14 +74,15 @@ class Snowflake {
     //update NAT type
     console.log("NAT type: " + this.ui.natType);
     this.broker.setNATType(this.ui.natType);
-    recv = this.broker.getClientOffer(pair.id, this.proxyPairs.length);
+    const recv = this.broker.getClientOffer(pair.id, this.proxyPairs.length);
     recv.then((resp) => {
       var clientNAT = resp.NAT;
       if (!this.receiveOffer(pair, resp.Offer, resp.RelayURL)) {
-        return pair.close();
+        pair.close();
+        return;
       }
       //set a timeout for channel creation
-      return setTimeout((() => {
+      setTimeout((() => {
         if (!pair.webrtcIsReady()) {
           log('proxypair datachannel timed out waiting for open');
           pair.close();
@@ -103,25 +108,25 @@ class Snowflake {
               this.config.defaultBrokerPollInterval);
           this.natFailures = 0;
         }
-        return;
       }), this.config.datachannelTimeout);
     }, function () {
       //on error, close proxy pair
-      return pair.close();
+      pair.close();
     });
-    return this.retries++;
+    this.retries++;
   }
 
-  // Receive an SDP offer from some client assigned by the Broker,
-  // |pair| - an available ProxyPair.
+  /**
+   * Receive an SDP offer from some client assigned by the Broker
+   * @param {ProxyPair} pair an available ProxyPair.
+   * @returns {boolean} `true` on success, `false` on fail.
+   */
   receiveOffer(pair, desc, relayURL) {
-    var e, offer, sdp;
-
     try {
       if (relayURL !== undefined) {
-        let relayURLParsed = new URL(relayURL);
-        let hostname = relayURLParsed.hostname;
-        let protocol = relayURLParsed.protocol;
+        const relayURLParsed = new URL(relayURL);
+        const hostname = relayURLParsed.hostname;
+        const protocol = relayURLParsed.protocol;
         if (protocol !== "wss:") {
           log('incorrect relay url protocol');
           return false;
@@ -132,69 +137,63 @@ class Snowflake {
         }
         pair.setRelayURL(relayURL);
       }
-      offer = JSON.parse(desc);
+      const offer = JSON.parse(desc);
       dbg('Received:\n\n' + offer.sdp + '\n');
-      sdp = new RTCSessionDescription(offer);
+      const sdp = new RTCSessionDescription(offer);
       if (pair.receiveWebRTCOffer(sdp)) {
         this.sendAnswer(pair);
         return true;
       } else {
         return false;
       }
-    } catch (error) {
-      e = error;
+    } catch (e) {
       log('ERROR: Unable to receive Offer: ' + e);
       return false;
     }
   }
 
   sendAnswer(pair) {
-    var fail, next;
-    next = function (sdp) {
+    const next = function (sdp) {
       dbg('webrtc: Answer ready.');
-      return pair.pc.setLocalDescription(sdp).catch(fail);
+      pair.pc.setLocalDescription(sdp).catch(fail);
     };
-    fail = function () {
+    const fail = function () {
       pair.close();
-      return dbg('webrtc: Failed to create or set Answer');
+      dbg('webrtc: Failed to create or set Answer');
     };
-    return pair.pc.createAnswer().then(next).catch(fail);
+    pair.pc.createAnswer().then(next).catch(fail);
   }
 
+  /**
+   * @returns {null | ProxyPair}
+   */
   makeProxyPair() {
     if (this.proxyPairs.length >= this.config.maxNumClients) {
       return null;
     }
-    var pair;
-    pair = new ProxyPair(this.relayAddr, this.rateLimit, this.config);
+    const pair = new ProxyPair(this.relayAddr, this.rateLimit, this.config);
     this.proxyPairs.push(pair);
 
-    log('Snowflake IDs: ' + (this.proxyPairs.map(function (p) {
-      return p.id;
-    })).join(' | '));
+    log('Snowflake IDs: ' + (this.proxyPairs.map(p => p.id)).join(' | '));
 
     pair.onCleanup = () => {
-      var ind;
       // Delete from the list of proxy pairs.
-      ind = this.proxyPairs.indexOf(pair);
+      const ind = this.proxyPairs.indexOf(pair);
       if (ind > -1) {
-        return this.proxyPairs.splice(ind, 1);
+        this.proxyPairs.splice(ind, 1);
       }
     };
     pair.begin();
     return pair;
   }
 
-  // Stop all proxypairs.
+  /** Stop all proxypairs. */
   disable() {
-    var results;
     log('Disabling Snowflake.');
-    clearTimeout(this.pollTimeout);
-    results = [];
+    clearTimeout(this.pollTimeoutId);
     while (this.proxyPairs.length > 0) {
-      results.push(this.proxyPairs.pop().close());
+      this.proxyPairs.pop().close();
     }
-    return results;
   }
 
   /**

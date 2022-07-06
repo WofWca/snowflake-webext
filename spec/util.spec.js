@@ -139,7 +139,7 @@ describe('Parse', function() {
       {
         // local addresses only
         sdp: "v=0\no=jdoe 2890844526 2890842807 IN IP4 10.47.16.5\ns=SDP Seminar\ni=A Seminar on the session description protocol\nu=http://www.example.com/seminars/sdp.pdf\ne=j.doe@example.com (Jane Doe)\nc=IN IP4 10.47.16.5\nt=2873397496 2873404696\na=recvonly\nm=audio 49170 RTP/AVP 0\nm=video 51372 RTP/AVP 99\na=rtpmap:99 h263-1998/90000",
-        expected: void 0
+        expected: undefined
       },
       {
         sdp: "v=0\no=jdoe 2890844526 2890842807 IN IP4 10.47.16.5\ns=SDP Seminar\ni=A Seminar on the session description protocol\nu=http://www.example.com/seminars/sdp.pdf\ne=j.doe@example.com (Jane Doe)\nc=IN IP4 10.47.16.5\na=candidate:3581707038 1 udp 2122260223 192.168.0.1 54653 typ host generation 0 network-id 1 network-cost 50\na=candidate:2617212910 1 tcp 1518280447 192.168.0.1 59673 typ host tcptype passive generation 0 network-id 1 network-cost 50\na=candidate:2082671819 1 udp 1686052607 1.2.3.4 54653 typ srflx raddr 192.168.0.1 rport 54653 generation 0 network-id 1 network-cost 50\nt=2873397496 2873404696\na=recvonly\nm=audio 49170 RTP/AVP 0\nm=video 51372 RTP/AVP 99\na=rtpmap:99 h263-1998/90000",
@@ -148,7 +148,7 @@ describe('Parse', function() {
       {
         // Missing c= line
         sdp: "v=0\no=jdoe 2890844526 2890842807 IN IP4 10.47.16.5\ns=SDP Seminar\ni=A Seminar on the session description protocol\nu=http://www.example.com/seminars/sdp.pdf\ne=j.doe@example.com (Jane Doe)\nt=2873397496 2873404696\na=recvonly\nm=audio 49170 RTP/AVP 0\nm=video 51372 RTP/AVP 99\na=rtpmap:99 h263-1998/90000",
-        expected: void 0
+        expected: undefined
       },
       {
         // Single line, IP address only
@@ -188,17 +188,17 @@ describe('Parse', function() {
       {
         // Improper character within IPv4
         sdp: "c=IN IP4 224.2z.1.1",
-        expected: void 0
+        expected: undefined
       },
       {
         // Improper character within IPv6
         sdp: "c=IN IP6 ff15:g::101",
-        expected: void 0
+        expected: undefined
       },
       {
         // Bogus "IP7" addrtype
         sdp: "c=IN IP7 1.2.3.4\n",
-        expected: void 0
+        expected: undefined
       }
     ];
 
@@ -212,8 +212,8 @@ describe('Parse', function() {
         // and also accept records terminated with a single newline character."
         // We represent the test cases with LF line endings for convenience, and
         // test them both that way and with CRLF line endings.
-        expect((ref = Parse.ipFromSDP(test.sdp)) != null ? ref.toLowerCase() : void 0).toEqual(test.expected);
-        results.push(expect((ref1 = Parse.ipFromSDP(test.sdp.replace(/\n/, "\r\n"))) != null ? ref1.toLowerCase() : void 0).toEqual(test.expected));
+        expect((ref = Parse.ipFromSDP(test.sdp)) != null ? ref.toLowerCase() : undefined).toEqual(test.expected);
+        results.push(expect((ref1 = Parse.ipFromSDP(test.sdp.replace(/\n/, "\r\n"))) != null ? ref1.toLowerCase() : undefined).toEqual(test.expected));
       }
       return results;
     });

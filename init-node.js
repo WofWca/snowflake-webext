@@ -13,7 +13,7 @@ var broker = new Broker(config);
 var snowflake = new Snowflake(config, ui, broker);
 
 var log = function(msg) {
-  return console.log('Snowflake: ' + msg);
+  console.log('Snowflake: ' + msg);
 };
 
 var dbg = log;

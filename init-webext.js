@@ -27,7 +27,7 @@ class WebExtUI extends UI {
   initNATType() {
     this.natType = "unknown";
     this.checkNAT();
-    return setInterval(() => {this.checkNAT();}, config.natCheckInterval);
+    setInterval(() => {this.checkNAT();}, config.natCheckInterval);
   }
 
   tryProbe() {
@@ -52,7 +52,7 @@ class WebExtUI extends UI {
     }))
     .then((result) => {
       let enabled = this.enabled;
-      if (result['snowflake-enabled'] !== void 0) {
+      if (result['snowflake-enabled'] !== undefined) {
         enabled = result['snowflake-enabled'];
       } else {
         log("Toggle state not yet saved");
@@ -77,9 +77,7 @@ class WebExtUI extends UI {
     if (!this.port) { return; }
     this.port.postMessage({
       clients: this.clients,
-      total: this.stats.reduce((function(t, c) {
-        return t + c;
-      }), 0),
+      total: this.stats.reduce((t, c) => t + c, 0),
       enabled: this.enabled,
       missingFeature: this.missingFeature,
     });
@@ -166,12 +164,14 @@ var debug, snowflake, config, broker, ui, log, dbg, init, update, silenceNotific
   // log to console.
   log = function(msg) {
     console.log('Snowflake: ' + msg);
-    return snowflake != null ? snowflake.ui.log(msg) : void 0;
+    if (snowflake != null) {
+      snowflake.ui.log(msg);
+    }
   };
 
   dbg = function(msg) {
     if (debug) {
-      return log(msg);
+      log(msg);
     }
   };
 
@@ -196,7 +196,7 @@ var debug, snowflake, config, broker, ui, log, dbg, init, update, silenceNotific
     dbg('Contacting Broker at ' + broker.url);
     log('Starting snowflake');
     snowflake.setRelayAddr(config.relayAddr);
-    return snowflake.beginWebRTC();
+    snowflake.beginWebRTC();
   };
 
   window.onunload = function() {

@@ -1,7 +1,7 @@
 /* exported Util, Params, DummyRateLimit */
 /* global Config */
 
-/*
+/**
 A JavaScript WebRTC snowflake proxy
 
 Contains helpers for parsing query strings and other utilities.
@@ -21,10 +21,12 @@ class Util {
     return navigator.cookieEnabled;
   }
 
-  // returns a promise that resolves to "restricted" if we
-  // fail to make a test connection to a known restricted
-  // NAT, "unrestricted" if the test connection succeeds, and
-  // "unknown" if we fail to reach the probe test server
+  /**
+   * returns a promise that resolves to "restricted" if we
+   * fail to make a test connection to a known restricted
+   * NAT, "unrestricted" if the test connection succeeds, and
+   * "unknown" if we fail to reach the probe test server
+   */
   static checkNATType(timeout) {
     let pc = new RTCPeerConnection({iceServers: [
       {urls: 'stun:stun1.l.google.com:19302'}
@@ -65,12 +67,13 @@ class Util {
     }));
   }
 
-  // Assumes getClientOffer happened, and a WebRTC SDP answer has been generated.
-  // Sends it back to the broker, which passes it back to the original client.
+  /**
+   * Assumes getClientOffer happened, and a WebRTC SDP answer has been generated.
+   * Sends it back to the broker, which passes it back to the original client.
+   */
   static sendOffer(offer) {
     return new Promise((fulfill, reject) => {
-      var xhr;
-      xhr = new XMLHttpRequest();
+      const xhr = new XMLHttpRequest();
       xhr.timeout = 30 * 1000;
       xhr.onreadystatechange = function() {
         if (xhr.DONE !== xhr.readyState) {
@@ -92,7 +95,7 @@ class Util {
         console.log('Signaling Server: exception while connecting: ' + error.message);
         return reject('unable to connect to signaling server');
       }
-      return xhr.send(JSON.stringify(data));
+      xhr.send(JSON.stringify(data));
     });
   }
 }
@@ -100,24 +103,22 @@ class Util {
 
 class Parse {
 
-  // Parse a cookie data string (usually document.cookie). The return type is an
-  // object mapping cookies names to values. Returns null on error.
-  // http://www.w3.org/TR/DOM-Level-2-HTML/html.html#ID-8747038
+  /**
+   * Parse a cookie data string (usually document.cookie). The return type is an
+   * object mapping cookies names to values. Returns null on error.
+   * http://www.w3.org/TR/DOM-Level-2-HTML/html.html#ID-8747038
+   */
   static cookie(cookies) {
-    var i, j, len, name, result, string, strings, value;
-    result = {};
-    strings = [];
-    if (cookies) {
-      strings = cookies.split(';');
-    }
-    for (i = 0, len = strings.length; i < len; i++) {
-      string = strings[i];
-      j = string.indexOf('=');
+    const result = {};
+    const strings = cookies ? cookies.split(';') : [];
+    for (let i = 0, len = strings.length; i < len; i++) {
+      const string = strings[i];
+      const j = string.indexOf('=');
       if (-1 === j) {
         return null;
       }
-      name = decodeURIComponent(string.substr(0, j).trim());
-      value = decodeURIComponent(string.substr(j + 1).trim());
+      const name = decodeURIComponent(string.substr(0, j).trim());
+      const value = decodeURIComponent(string.substr(j + 1).trim());
       if (!(name in result)) {
         result[name] = value;
       }
@@ -125,11 +126,12 @@ class Parse {
     return result;
   }
 
-  // Parse an address in the form 'host:port'. Returns an Object with keys 'host'
-  // (String) and 'port' (int). Returns null on error.
+  /**
+   * Parse an address in the form 'host:port'. Returns an Object with keys 'host'
+   * (String) and 'port' (int). Returns null on error.
+   */
   static address(spec) {
-    var host, m, port;
-    m = null;
+    let m = null;
     if (!m) {
       // IPv6 syntax.
       m = spec.match(/^\[([\0-9a-fA-F:.]+)\]:([0-9]+)$/);
@@ -142,8 +144,8 @@ class Parse {
       // TODO: Domain match
       return null;
     }
-    host = m[1];
-    port = parseInt(m[2], 10);
+    const host = m[1];
+    const port = parseInt(m[2], 10);
     if (isNaN(port) || port < 0 || port > 65535) {
       return null;
     }
@@ -153,8 +155,10 @@ class Parse {
     };
   }
 
-  // Parse a count of bytes. A suffix of 'k', 'm', or 'g' (or uppercase)
-  // does what you would think. Returns null on error.
+  /**
+   * Parse a count of bytes. A suffix of 'k', 'm', or 'g' (or uppercase)
+   * does what you would think. Returns null on error.
+   */
   static byteCount(spec) {
     let matches = spec.match(/^(\d+(?:\.\d*)?)(\w*)$/);
     if (matches === null) {
@@ -178,23 +182,24 @@ class Parse {
     return count * multiplier;
   }
 
-  //Parse a remote connection-address out of the "c=" Connection Data field
-  // or the "a=" attribute fields of the session description.
-  // Return undefined if none is found.
-  // https://tools.ietf.org/html/rfc4566#section-5.7
-  // https://tools.ietf.org/html/rfc5245#section-15
+  /**
+   * Parse a remote connection-address out of the "c=" Connection Data field
+   * or the "a=" attribute fields of the session description.
+   * Return undefined if none is found.
+   * https://tools.ietf.org/html/rfc4566#section-5.7
+   * https://tools.ietf.org/html/rfc5245#section-15
+   */
   static ipFromSDP(sdp) {
-    var i, len, m, pattern, ref;
     console.log(sdp);
-    ref = [
+    const ref = [
       /^a=candidate:[a-zA-Z0-9+/]+ \d+ udp \d+ ([\d.]+) /mg,
       /^a=candidate:[a-zA-Z0-9+/]+ \d+ udp \d+ ([0-9A-Fa-f:.]+) /mg,
       /^c=IN IP4 ([\d.]+)(?:(?:\/\d+)?\/\d+)?(:? |$)/mg,
       /^c=IN IP6 ([0-9A-Fa-f:.]+)(?:\/\d+)?(:? |$)/mg
     ];
-    for (i = 0, len = ref.length; i < len; i++) {
-      pattern = ref[i];
-      m = pattern.exec(sdp);
+    for (let i = 0, len = ref.length; i < len; i++) {
+      const pattern = ref[i];
+      let m = pattern.exec(sdp);
       while (m != null) {
         if(Parse.isRemoteIP(m[1])) return m[1];
         m = pattern.exec(sdp);
@@ -202,19 +207,20 @@ class Parse {
     }
   }
 
-  // Parse the mapped port out of an ice candidate returned from the
-  // onicecandidate callback
+  /**
+   * Parse the mapped port out of an ice candidate returned from the
+   * onicecandidate callback
+   */
   static portFromCandidate(c) {
-    var m, pattern;
-    pattern = /(?:[\d.]+|[0-9A-Fa-f:.]+) (\d+) typ srflx/m;
-    m = pattern.exec(c);
+    const pattern = /(?:[\d.]+|[0-9A-Fa-f:.]+) (\d+) typ srflx/m;
+    const m = pattern.exec(c);
     if (m != null) {
       return m[1];
     }
     return null;
   }
 
-  // Determine whether an IP address is a local, unspecified, or loopback address
+  /** Determine whether an IP address is a local, unspecified, or loopback address */
   static isRemoteIP(ip) {
     if (ip.includes(":")) {
       var ip6 = ip.split(':');
@@ -247,8 +253,7 @@ class Params {
     if (!query.has(param)) {
       return defaultValue;
     }
-    var val;
-    val = query.get(param);
+    const val = query.get(param);
     if ('true' === val || '1' === val || '' === val) {
       return true;
     }
@@ -258,9 +263,11 @@ class Params {
     return null;
   }
 
-  // Get an object value and parse it as a byte count. Example byte counts are
-  // '100' and '1.3m'. Returns |defaultValue| if param is not a key. Return null
-  // on a parsing error.
+  /**
+   * Get an object value and parse it as a byte count. Example byte counts are
+   * '100' and '1.3m'. Returns |defaultValue| if param is not a key. Return null
+   * on a parsing error.
+   */
   static getByteCount(query, param, defaultValue) {
     if (!query.has(param)) {
       return defaultValue;
@@ -279,13 +286,12 @@ class BucketRateLimit {
   }
 
   age() {
-    var delta, now;
-    now = new Date();
-    delta = (now - this.lastUpdate) / 1000.0;
+    const now = new Date();
+    const delta = (now - this.lastUpdate) / 1000.0;
     this.lastUpdate = now;
     this.amount -= delta * this.capacity / this.time;
     if (this.amount < 0.0) {
-      return this.amount = 0.0;
+      this.amount = 0.0;
     }
   }
 
@@ -295,7 +301,7 @@ class BucketRateLimit {
     return this.amount <= this.capacity;
   }
 
-  // How many seconds in the future will the limit expire?
+  /** How many seconds in the future will the limit expire? */
   when() {
     this.age();
     return (this.amount - this.capacity) / (this.capacity / this.time);
@@ -313,7 +319,7 @@ BucketRateLimit.prototype.amount = 0.0;
 BucketRateLimit.prototype.lastUpdate = new Date();
 
 
-// A rate limiter that never limits.
+/** A rate limiter that never limits. */
 class DummyRateLimit {
 
   constructor(capacity, time) {

@@ -16,8 +16,7 @@ class DebugUI extends UI {
 
   // Status bar
   setStatus(msg) {
-    var txt;
-    txt = document.createTextNode('Status: ' + msg);
+    const txt = document.createTextNode('Status: ' + msg);
     while (this.$status.firstChild) {
       this.$status.removeChild(this.$status.firstChild);
     }
@@ -73,28 +72,24 @@ var snowflake, query, debug, ui, silenceNotifications, log, dbg, init;
   // log to console.
   log = function(msg) {
     console.log('Snowflake: ' + msg);
-    return snowflake != null ? snowflake.ui.log(msg) : void 0;
+    return snowflake != null ? snowflake.ui.log(msg) : undefined;
   };
 
   dbg = function(msg) {
-    if (debug || ((snowflake != null ? snowflake.ui : void 0) instanceof DebugUI)) {
+    if (debug || ((snowflake != null ? snowflake.ui : undefined) instanceof DebugUI)) {
       return log(msg);
     }
   };
 
   init = function() {
-    var broker, config, ui;
-    config = new Config("testing");
+    const config = new Config("testing");
     if ('off' !== query['ratelimit']) {
       config.rateLimitBytes = Params.getByteCount(query, 'ratelimit', config.rateLimitBytes);
     }
-    ui = null;
-    if (document.getElementById('status') !== null) {
-      ui = new DebugUI();
-    } else {
-      ui = new UI();
-    }
-    broker = new Broker(config);
+    const ui = document.getElementById('status') !== null
+      ? new DebugUI()
+      : new UI();
+    const broker = new Broker(config);
     snowflake = new Snowflake(config, ui, broker);
     log('== snowflake proxy ==');
     if (Util.snowflakeIsDisabled(config.cookieName)) {
