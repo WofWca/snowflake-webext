@@ -57,7 +57,7 @@
     "message": "Install in Chrome"
   },
   "installStandalone": {
-    "message": "If you would like to run a command-line version of the Snowflake proxy on your desktop or server, see our <a href=\"https://community.torproject.org/relay/setup/snowflake/standalone/\">community documentation</a> for running a standalone Snowflake proxy."
+    "message": "If you would like to run a command-line version of the Snowflake proxy on your desktop or server, see our <a href=\"https://community.torproject.org/relay/setup/snowflake/standalone/\">documentation</a> for running a standalone proxy."
   },
   "reportingBugs": {
     "message": "Reporting Bugs"
