@@ -104,7 +104,7 @@ var
     if ('off' !== query['ratelimit']) {
       config.rateLimitBytes = Params.getByteCount(query, 'ratelimit', config.rateLimitBytes);
     }
-    const ui = document.getElementById('status') !== null
+    ui = document.getElementById('status') !== null
       ? new DebugUI()
       : new UI();
     const broker = new Broker(config);
