@@ -50,7 +50,25 @@ DebugUI.prototype.$status = null;
 Entry point.
 */
 
-var snowflake, query, debug, ui, silenceNotifications, log, dbg, init;
+/** @typedef {DebugUI | UI} UIOfThisContext */
+var
+  /** @type {boolean} */
+  debug,
+  /** @type {Snowflake | null} */
+  snowflake,
+  /** @type {URLSearchParams} */
+  query,
+  /** @type {UIOfThisContext} */
+  ui,
+  /** @type {(msg: unknown) => void} */
+  log,
+  /** @type {(msg: unknown) => void} */
+  dbg,
+  /** @type {() => void} */
+  init,
+  /** @type {boolean} */
+  silenceNotifications;
+
 
 (function() {
 

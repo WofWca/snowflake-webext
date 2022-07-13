@@ -22,10 +22,12 @@ class Util {
   }
 
   /**
-   * returns a promise that resolves to "restricted" if we
+   * @returns {Promise<"restricted" | "unrestricted">}
+   * resolves to "restricted" if we
    * fail to make a test connection to a known restricted
    * NAT, "unrestricted" if the test connection succeeds, and
    * "unknown" if we fail to reach the probe test server
+   * @param {number} timeout
    */
   static checkNATType(timeout) {
     let pc = new RTCPeerConnection({iceServers: [
@@ -70,6 +72,7 @@ class Util {
   /**
    * Assumes getClientOffer happened, and a WebRTC SDP answer has been generated.
    * Sends it back to the broker, which passes it back to the original client.
+   * @param {RTCSessionDescription} offer
    */
   static sendOffer(offer) {
     return new Promise((fulfill, reject) => {
@@ -105,6 +108,7 @@ class Util {
 class Parse {
 
   /**
+   * @param {typeof document.cookie} cookies
    * Parse a cookie data string (usually document.cookie). The return type is an
    * object mapping cookies names to values. Returns null on error.
    * http://www.w3.org/TR/DOM-Level-2-HTML/html.html#ID-8747038
@@ -128,6 +132,7 @@ class Parse {
   }
 
   /**
+   * @param {string} spec
    * Parse an address in the form 'host:port'. Returns an Object with keys 'host'
    * (String) and 'port' (int). Returns null on error.
    */

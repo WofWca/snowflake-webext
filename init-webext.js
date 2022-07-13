@@ -109,6 +109,9 @@ class WebExtUI extends UI {
     this.port = null;
   }
 
+  /**
+   * @param {boolean} enabled
+   */
   setEnabled(enabled) {
     this.enabled = enabled;
     this.postActive();
@@ -148,7 +151,28 @@ WebExtUI.prototype.enabled = true;
 Entry point.
 */
 
-var debug, snowflake, config, broker, ui, log, dbg, init, update, silenceNotifications;
+/** @typedef {WebExtUI} UIOfThisContext */
+var
+  /** @type {boolean} */
+  debug,
+  /** @type {Snowflake | null} */
+  snowflake,
+  /** @type {Config | null} */
+  config,
+  /** @type {Broker | null} */
+  broker,
+  /** @type {UIOfThisContext | null} */
+  ui,
+  /** @type {(msg: unknown) => void} */
+  log,
+  /** @type {(msg: unknown) => void} */
+  dbg,
+  /** @type {() => void} */
+  init,
+  /** @type {() => void} */
+  update,
+  /** @type {boolean} */
+  silenceNotifications;
 
 (function () {
 

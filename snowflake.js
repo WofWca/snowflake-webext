@@ -13,7 +13,12 @@ TODO: More documentation
 
 class Snowflake {
 
-  // Prepare the Snowflake with a Broker (to find clients) and optional UI.
+  /**
+   * Prepare the Snowflake with a Broker (to find clients) and optional UI.
+   * @param {Config} config
+   * @param {WebExtUI | BadgeUI | DebugUI} ui
+   * @param {Broker} broker
+   */
   constructor(config, ui, broker) {
     this.receiveOffer = this.receiveOffer.bind(this);
 
@@ -36,6 +41,7 @@ class Snowflake {
    * Set the target relay address spec, which is expected to be websocket.
    * TODO: Should potentially fetch the target from broker later, or modify
    * entirely for the Tor-independent version.
+   * @param {{ host: string; port: string; }} relayAddr
    */
   setRelayAddr(relayAddr) {
     this.relayAddr = relayAddr;
@@ -119,6 +125,8 @@ class Snowflake {
   /**
    * Receive an SDP offer from some client assigned by the Broker
    * @param {ProxyPair} pair an available ProxyPair.
+   * @param {string} desc
+   * @param {string | undefined} relayURL
    * @returns {boolean} `true` on success, `false` on fail.
    */
   receiveOffer(pair, desc, relayURL) {
@@ -137,6 +145,7 @@ class Snowflake {
         }
         pair.setRelayURL(relayURL);
       }
+      /** @type {RTCSessionDescriptionInit} */
       const offer = JSON.parse(desc);
       dbg('Received:\n\n' + offer.sdp + '\n');
       const sdp = new RTCSessionDescription(offer);
@@ -152,7 +161,11 @@ class Snowflake {
     }
   }
 
+  /**
+   * @param {ProxyPair} pair
+   */
   sendAnswer(pair) {
+    /** @param {RTCLocalSessionDescriptionInit} sdp */
     const next = function (sdp) {
       dbg('webrtc: Answer ready.');
       pair.pc.setLocalDescription(sdp).catch(fail);

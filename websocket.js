@@ -79,7 +79,7 @@ class WS {
   }
 
   static probeWebsocket(addr) {
-    return new Promise((resolve, reject) => {
+    return /** @type {Promise<void>} */(new Promise((resolve, reject) => {
       const ws = WS.makeWebsocket(addr);
       ws.onopen = () => {
         resolve();
@@ -89,7 +89,7 @@ class WS {
         reject();
         ws.close();
       };
-    });
+    }));
   }
 
 }

@@ -122,7 +122,32 @@ function getLang() {
   return defaultLang;
 }
 
-var debug, snowflake, config, broker, ui, log, dbg, init, update, silenceNotifications, query, tryProbe;
+/** @typedef {BadgeUI} UIOfThisContext */
+var
+  /** @type {boolean} */
+  debug,
+  /** @type {Snowflake | null} */
+  snowflake,
+  /** @type {Config | null} */
+  config,
+  /** @type {Broker | null} */
+  broker,
+  /** @type {UIOfThisContext | null} */
+  ui,
+  /** @type {(msg: unknown) => void} */
+  log,
+  /** @type {(msg: unknown) => void} */
+  dbg,
+  /** @type {() => void} */
+  init,
+  /** @type {() => void} */
+  update,
+  /** @type {boolean} */
+  silenceNotifications,
+  /** @type {URLSearchParams} */
+  query,
+  /** @type {() => void} */
+  tryProbe;
 
 (function() {
 

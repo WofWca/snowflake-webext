@@ -14,6 +14,7 @@ class ProxyPair {
   /**
    * @param relayAddr the destination relay
    * @param {*} rateLimit specifies a rate limit on traffic
+   * @param {Config} config
    */
   constructor(relayAddr, rateLimit, config) {
     this.prepareDataChannel = this.prepareDataChannel.bind(this);
@@ -23,6 +24,7 @@ class ProxyPair {
     this.onError = this.onError.bind(this);
     this.flush = this.flush.bind(this);
 
+    /** @type {string | undefined} */
     this.relayURL = undefined;
     this.relayAddr = relayAddr;
     this.rateLimit = rateLimit;
@@ -53,6 +55,10 @@ class ProxyPair {
     };
   }
 
+  /**
+   * @param {RTCSessionDescription} offer
+   * @returns {boolean} `true` on success, `false` on fail.
+   */
   receiveWebRTCOffer(offer) {
     if ('offer' !== offer.type) {
       log('Invalid SDP received -- was not an offer.');
@@ -68,7 +74,10 @@ class ProxyPair {
     return true;
   }
 
-  /** Given a WebRTC DataChannel, prepare callbacks. */
+  /**
+   * Given a WebRTC DataChannel, prepare callbacks.
+   * @param {RTCDataChannel} channel
+   */
   prepareDataChannel(channel) {
     channel.onopen = () => {
       log('WebRTC DataChannel opened!');
@@ -146,7 +155,10 @@ class ProxyPair {
     }), 5000);
   }
 
-  /** WebRTC --> websocket */
+  /**
+   * WebRTC --> websocket
+   * @param {MessageEvent} msg
+   */
   onClientToRelayMessage(msg) {
     if (this.messageTimer) {
       clearTimeout(this.messageTimer);
@@ -164,7 +176,10 @@ class ProxyPair {
     this.flush();
   }
 
-  /** websocket --> WebRTC */
+  /**
+   * websocket --> WebRTC
+   * @param {MessageEvent} event
+   */
   onRelayToClientMessage(event) {
     dbg('websocket --> WebRTC data: ' + event.data.byteLength + ' bytes');
     this.r2cSchedule.push(event.data);
@@ -239,6 +254,9 @@ class ProxyPair {
     return (null !== this.relay) && (WebSocket.OPEN === this.relay.readyState);
   }
 
+  /**
+   * @param {WebSocket} ws
+   */
   isClosed(ws) {
     return undefined === ws || WebSocket.CLOSED === ws.readyState;
   }
@@ -247,6 +265,9 @@ class ProxyPair {
     return (null !== this.pc) && ('closed' !== this.pc.connectionState);
   }
 
+  /**
+   * @param {typeof this.relayURL} relayURL
+   */
   setRelayURL(relayURL) {
     this.relayURL = relayURL;
   }

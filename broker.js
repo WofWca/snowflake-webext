@@ -15,6 +15,7 @@ class Broker {
    * ID so the Broker can keep track of each proxy's signalling channels.
    * On construction, this Broker object does not do anything until
    * `getClientOffer` is called.
+   * @param {Config} config
    */
   constructor(config) {
     this.getClientOffer = this.getClientOffer.bind(this);
@@ -85,6 +86,8 @@ class Broker {
   /**
    * Assumes getClientOffer happened, and a WebRTC SDP answer has been generated.
    * Sends it back to the broker, which passes it to back to the original client.
+   * @param {string} id
+   * @param {RTCSessionDescription} answer
    */
   sendAnswer(id, answer) {
     dbg(id + ' - Sending answer back to broker...\n');
@@ -114,8 +117,10 @@ class Broker {
   }
 
   /**
-   * urlSuffix for the broker is different depending on what action
+   * @param {XMLHttpRequest} xhr
+   * @param {string} urlSuffix for the broker is different depending on what action
    * is desired.
+   * @param {string} payload
    */
   _postRequest(xhr, urlSuffix, payload) {
     try {
