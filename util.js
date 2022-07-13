@@ -80,15 +80,16 @@ class Util {
           return;
         }
         switch (xhr.status) {
-          case 200:
-            var response = JSON.parse(xhr.responseText);
+          case 200: {
+            const response = JSON.parse(xhr.responseText);
             return fulfill(response.Answer); // Should contain offer.
+          }
           default:
             console.log('Probe ERROR: Unexpected ' + xhr.status + ' - ' + xhr.statusText);
             return reject('Failed to get answer from probe service');
         }
       };
-      var data = {"Status": "client match", "Offer": JSON.stringify(offer)};
+      const data = {"Status": "client match", "Offer": JSON.stringify(offer)};
       try {
         xhr.open('POST', Config.PROBEURL);
       } catch (error) {
@@ -223,18 +224,18 @@ class Parse {
   /** Determine whether an IP address is a local, unspecified, or loopback address */
   static isRemoteIP(ip) {
     if (ip.includes(":")) {
-      var ip6 = ip.split(':');
+      const ip6 = ip.split(':');
       // Loopback address
-      var loopback = /^(?:0*:)*?:?0*1$/m;
+      const loopback = /^(?:0*:)*?:?0*1$/m;
       // Unspecified address
-      var unspecified = /^(?:0*:)*?:?0*$/m;
+      const unspecified = /^(?:0*:)*?:?0*$/m;
       // Local IPv6 addresses are defined in https://tools.ietf.org/html/rfc4193
       return !((loopback.exec(ip) != null) || (unspecified.exec(ip) != null) ||
         (parseInt(ip6[0],16)&0xfe00) == 0xfc00);
     }
 
     // Local IPv4 addresses are defined in https://tools.ietf.org/html/rfc1918
-    var ip4 = ip.split('.');
+    const ip4 = ip.split('.');
     return !(ip4[0] == 10 || ip4[0] == 127 || ip == "0.0.0.0" ||
       (ip4[0] == 172 && (ip4[1]&0xf0) == 16) ||
       (ip4[0] == 192 && ip4[1] == 168) ||

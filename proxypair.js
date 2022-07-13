@@ -111,7 +111,7 @@ class ProxyPair {
     if (peer_ip != null) {
       params.push(["client_ip", peer_ip]);
     }
-    var relay = this.relay =
+    const relay = this.relay =
       (this.relayURL === undefined) ?
         WS.makeWebsocket(this.relayAddr, params) :
         WS.makeWebsocketFromURL(this.relayURL, params);

@@ -9,8 +9,7 @@ class WS {
    * are required. See RFC 3986, section 3.
    */
   static buildUrl(scheme, host, port, path, params) {
-    var parts;
-    parts = [];
+    const parts = [];
     parts.push(encodeURIComponent(scheme));
     parts.push('://');
     // If it contains a colon but no square brackets, treat it as IPv6.
@@ -42,10 +41,9 @@ class WS {
   }
 
   static makeWebsocket(addr, params) {
-    var url, ws, wsProtocol;
-    wsProtocol = this.WSS_ENABLED ? 'wss' : 'ws';
-    url = this.buildUrl(wsProtocol, addr.host, addr.port, '/', params);
-    ws = new WebSocket(url);
+    const wsProtocol = this.WSS_ENABLED ? 'wss' : 'ws';
+    const url = this.buildUrl(wsProtocol, addr.host, addr.port, '/', params);
+    const ws = new WebSocket(url);
     /*
     'User agents can use this as a hint for how to handle incoming binary data:
     if the attribute is set to 'blob', it is safe to spool it to disk, and if it

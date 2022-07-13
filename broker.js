@@ -51,8 +51,8 @@ class Broker {
           return;
         }
         switch (xhr.status) {
-          case Broker.CODE.OK:
-            var response = JSON.parse(xhr.responseText);
+          case Broker.CODE.OK: {
+            const response = JSON.parse(xhr.responseText);
             if (response.Status == Broker.STATUS.MATCH) {
               return fulfill(response); // Should contain offer.
             } else if (response.Status == Broker.STATUS.TIMEOUT) {
@@ -61,6 +61,7 @@ class Broker {
               log('Broker ERROR: Unexpected ' + response.Status);
               return reject(Broker.MESSAGE.UNEXPECTED);
             }
+          }
           default:
             log('Broker ERROR: Unexpected ' + xhr.status + ' - ' + xhr.statusText);
             snowflake.ui.setStatus(' failure. Please refresh.');
@@ -69,7 +70,7 @@ class Broker {
       };
       this._xhr = xhr; // Used by spec to fake async Broker interaction
       const clients = Math.floor(numClientsConnected / 8) * 8;
-      var data = {
+      const data = {
         Version: "1.3",
         Sid: id,
         Type: this.config.proxyType,
@@ -104,7 +105,7 @@ class Broker {
           break;
       }
     };
-    var data = {"Version": "1.0", "Sid": id, "Answer": JSON.stringify(answer)};
+    const data = {"Version": "1.0", "Sid": id, "Answer": JSON.stringify(answer)};
     this._postRequest(xhr, 'answer', JSON.stringify(data));
   }
 

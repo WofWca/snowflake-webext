@@ -76,7 +76,7 @@ class Snowflake {
     this.broker.setNATType(this.ui.natType);
     const recv = this.broker.getClientOffer(pair.id, this.proxyPairs.length);
     recv.then((resp) => {
-      var clientNAT = resp.NAT;
+      const clientNAT = resp.NAT;
       if (!this.receiveOffer(pair, resp.Offer, resp.RelayURL)) {
         pair.close();
         return;
