@@ -210,10 +210,6 @@ class ProxyPair {
 
   /** Send as much data in both directions as the rate limit currently allows. */
   flush() {
-    if (this.flush_timeout_id) {
-      clearTimeout(this.flush_timeout_id);
-    }
-    this.flush_timeout_id = null;
     let busy = true;
     while (busy && !this.rateLimit.isLimited()) {
       busy = false;
@@ -232,6 +228,11 @@ class ProxyPair {
         busy = true;
       }
     }
+
+    if (this.flush_timeout_id) {
+      clearTimeout(this.flush_timeout_id);
+    }
+    this.flush_timeout_id = null;
     if (this.r2cSchedule.length > 0 || this.c2rSchedule.length > 0 || (this.relayIsReady() && this.relay.bufferedAmount > 0) || (this.webrtcIsReady() && this.client.bufferedAmount > 0)) {
       this.flush_timeout_id = setTimeout(this.flush, this.rateLimit.when() * 1000);
     }
