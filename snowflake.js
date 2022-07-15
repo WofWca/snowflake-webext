@@ -65,11 +65,11 @@ class Snowflake {
    */
   pollBroker() {
     // Poll broker for clients.
-    const pair = this.makeProxyPair();
-    if (!pair) {
+    if (this.proxyPairs.length >= this.config.maxNumClients) {
       log('At client capacity.');
       return;
     }
+    const pair = this.makeProxyPair();
     log('Polling broker..');
     // Do nothing until a new proxyPair is available.
     let msg = 'Polling for client ... ';
@@ -178,12 +178,9 @@ class Snowflake {
   }
 
   /**
-   * @returns {null | ProxyPair}
+   * @returns {ProxyPair}
    */
   makeProxyPair() {
-    if (this.proxyPairs.length >= this.config.maxNumClients) {
-      return null;
-    }
     const pair = new ProxyPair(this.relayAddr, this.rateLimit, this.config);
     this.proxyPairs.push(pair);
 
