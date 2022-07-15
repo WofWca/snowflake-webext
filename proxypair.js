@@ -218,14 +218,14 @@ class ProxyPair {
     const checkChunks = () => {
       busy = false;
       // WebRTC --> websocket
-      if (this.relayIsReady() && this.relay.bufferedAmount < this.MAX_BUFFER && this.c2rSchedule.length > 0) {
+      if (this.c2rSchedule.length > 0 && this.relayIsReady() && this.relay.bufferedAmount < this.MAX_BUFFER) {
         const chunk = this.c2rSchedule.shift();
         this.rateLimit.update(chunk.byteLength);
         this.relay.send(chunk);
         busy = true;
       }
       // websocket --> WebRTC
-      if (this.webrtcIsReady() && this.client.bufferedAmount < this.MAX_BUFFER && this.r2cSchedule.length > 0) {
+      if (this.r2cSchedule.length > 0 && this.webrtcIsReady() && this.client.bufferedAmount < this.MAX_BUFFER) {
         const chunk = this.r2cSchedule.shift();
         this.rateLimit.update(chunk.byteLength);
         this.client.send(chunk);
