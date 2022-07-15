@@ -171,10 +171,9 @@ class ProxyPair {
   onClientToRelayMessage(msg) {
     dbg('WebRTC --> websocket data: ' + msg.data.byteLength + ' bytes');
     this.c2rSchedule.push(msg.data);
+    this.flush();
 
     this.refreshStaleTimeout();
-
-    this.flush();
   }
 
   /**
