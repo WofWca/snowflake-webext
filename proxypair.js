@@ -220,15 +220,15 @@ class ProxyPair {
       // WebRTC --> websocket
       if (this.c2rSchedule.length > 0 && this.relayIsReady() && this.relay.bufferedAmount < this.MAX_BUFFER) {
         const chunk = this.c2rSchedule.shift();
-        this.rateLimit.update(chunk.byteLength);
         this.relay.send(chunk);
+        this.rateLimit.update(chunk.byteLength);
         busy = true;
       }
       // websocket --> WebRTC
       if (this.r2cSchedule.length > 0 && this.webrtcIsReady() && this.client.bufferedAmount < this.MAX_BUFFER) {
         const chunk = this.r2cSchedule.shift();
-        this.rateLimit.update(chunk.byteLength);
         this.client.send(chunk);
+        this.rateLimit.update(chunk.byteLength);
         busy = true;
       }
     };
