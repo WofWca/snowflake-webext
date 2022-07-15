@@ -28,7 +28,7 @@ class Popup {
     this.statustext = document.getElementById('statustext');
     this.statusdesc = document.getElementById('statusdesc');
     this.img = document.getElementById('statusimg');
-    this.button = document.querySelector('.button');
+    this.enabledWrapper = document.getElementById('enabled-wrapper');
     if (
       typeof SUPPORTS_WEBEXT_OPTIONAL_BACKGROUND_PERMISSION !== 'undefined'
       // eslint-disable-next-line no-undef
@@ -76,8 +76,8 @@ class Popup {
     this.statusdesc.innerText = desc;
     setClass(this.statusdesc, 'error', error);
   }
-  setButton(hide) {
-    this.button.style.display = hide ? 'none' : 'block';
+  setEnabledWrapper(hide) {
+    this.enabledWrapper.style.display = hide ? 'none' : 'block';
   }
   setRetry(display) {
     this.retry.style.display = display ? 'inline-block' : 'none';
@@ -109,7 +109,7 @@ class Popup {
     this.setStatusDesc((total > 0) ? this.getMsgFunc('popupDescOn', String(total)) : '');
     this.setEnabled(true);
     this.setActive(this.active);
-    this.setButton(false);
+    this.setEnabledWrapper(false);
     this.setRetry(false);
   }
   turnOff(desc, error, retry) {
@@ -118,7 +118,7 @@ class Popup {
     this.setStatusDesc(desc ? this.getMsgFunc(desc) : '', error);
     this.setEnabled(false);
     this.setActive(false);
-    this.setButton(error);
+    this.setEnabledWrapper(error);
     this.setRetry(retry);
   }
   missingFeature(desc) {
