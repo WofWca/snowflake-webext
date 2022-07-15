@@ -215,7 +215,7 @@ class ProxyPair {
     }
     this.flush_timeout_id = null;
     let busy = true;
-    const checkChunks = () => {
+    while (busy && !this.rateLimit.isLimited()) {
       busy = false;
       // WebRTC --> websocket
       if (this.c2rSchedule.length > 0 && this.relayIsReady() && this.relay.bufferedAmount < this.MAX_BUFFER) {
@@ -231,9 +231,6 @@ class ProxyPair {
         this.rateLimit.update(chunk.byteLength);
         busy = true;
       }
-    };
-    while (busy && !this.rateLimit.isLimited()) {
-      checkChunks();
     }
     if (this.r2cSchedule.length > 0 || this.c2rSchedule.length > 0 || (this.relayIsReady() && this.relay.bufferedAmount > 0) || (this.webrtcIsReady() && this.client.bufferedAmount > 0)) {
       this.flush_timeout_id = setTimeout(this.flush, this.rateLimit.when() * 1000);
