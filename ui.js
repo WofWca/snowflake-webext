@@ -27,6 +27,7 @@ class UI {
 
   increaseClients() {
     this.clients += 1;
+    this.stats[0] += 1;
     this.postActive();
     return this.clients;
   }
