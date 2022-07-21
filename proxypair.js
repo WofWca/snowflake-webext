@@ -126,9 +126,9 @@ class ProxyPair {
         WS.makeWebsocketFromURL(this.relayURL, params);
     this.relay.label = 'websocket-relay';
     this.relay.onopen = () => {
-      if (this.timer) {
-        clearTimeout(this.timer);
-        this.timer = 0;
+      if (this.connectToRelayTimeoutId) {
+        clearTimeout(this.connectToRelayTimeoutId);
+        this.connectToRelayTimeoutId = 0;
       }
       log(relay.label + ' connected!');
       snowflake.ui.setStatus('connected');
@@ -146,8 +146,8 @@ class ProxyPair {
     this.relay.onerror = this.onError;
     this.relay.onmessage = this.onRelayToClientMessage;
     // TODO: Better websocket timeout handling.
-    this.timer = setTimeout((() => {
-      if (0 === this.timer) {
+    this.connectToRelayTimeoutId = setTimeout((() => {
+      if (0 === this.connectToRelayTimeoutId) {
         return;
       }
       log(relay.label + ' timed out connecting.');
@@ -194,9 +194,9 @@ class ProxyPair {
 
   /** Close both WebRTC and websocket. */
   close() {
-    if (this.timer) {
-      clearTimeout(this.timer);
-      this.timer = 0;
+    if (this.connectToRelayTimeoutId) {
+      clearTimeout(this.connectToRelayTimeoutId);
+      this.connectToRelayTimeoutId = 0;
     }
     if (this.messageTimer) {
       clearTimeout(this.messageTimer);
@@ -280,7 +280,7 @@ ProxyPair.prototype.pc = null;
 ProxyPair.prototype.client = null; // WebRTC Data channel
 ProxyPair.prototype.relay = null; // websocket
 
-ProxyPair.prototype.timer = 0;
+ProxyPair.prototype.connectToRelayTimeoutId = 0;
 ProxyPair.prototype.messageTimer = 0;
 ProxyPair.prototype.flush_timeout_id = null;
 
