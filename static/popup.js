@@ -26,8 +26,11 @@ class Popup {
     this.statusdesc = document.getElementById('statusdesc');
     this.img = document.getElementById('statusimg');
     this.button = document.querySelector('.button');
-    // if (SUPPORTS_WEBEXT_OPTIONAL_BACKGROUND_PERMISSION)
-    {
+    if (
+      typeof SUPPORTS_WEBEXT_OPTIONAL_BACKGROUND_PERMISSION !== 'undefined'
+      // eslint-disable-next-line no-undef
+      && SUPPORTS_WEBEXT_OPTIONAL_BACKGROUND_PERMISSION
+    ) {
       /** @type {HTMLInputElement} */
       const runInBackgroundInput = document.getElementById('run-in-background');
       document.getElementById('run-in-background-wrapper').classList.remove('display-none');

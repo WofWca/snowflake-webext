@@ -20,10 +20,22 @@ which outputs to the `build/` directory.
 
 ### Building the webextension
 
-```
-npm install
-npm run webext
-```
+1.
+    ```
+    npm install
+    ```
+2.
+    * For Gecko (e.g. Firefox):
+
+        ```bash
+        npm run webext gecko
+        ```
+
+    * For Chromium (e.g. Chrome, Edge)
+
+        ```bash
+        npm run webext chromium
+        ```
 
 and then load the `build-webext/` directory as an unpacked extension.
  * https://developer.mozilla.org/en-US/docs/Tools/about:debugging#Loading_a_temporary_extension
@@ -122,9 +134,9 @@ npm run pack-webext x.y.z
 git push origin master
 git push origin --tags
 
-# Upload the generated build-webext.zip (and source.zip) to the webextension stores,
-# 1. https://addons.mozilla.org/en-US/developers/addon/torproject-snowflake/versions/submit/
-# 2. https://chrome.google.com/webstore/devconsole/
+# Upload the generated build-webext-chromium.zip, build-webext-gecko.zip (and source.zip) to the webextension stores, respectively,
+# 1. https://chrome.google.com/webstore/devconsole/
+# 2. https://addons.mozilla.org/en-US/developers/addon/torproject-snowflake/versions/submit/
 
 # This time, really clean, because we don't want any extraneous files uploaded
 git clean -f -d -x

@@ -163,14 +163,43 @@ task('build', 'build the snowflake proxy', function() {
   console.log('Snowflake prepared.');
 });
 
-task('webext', 'build the webextension', function() {
+const browserEngines = ['chromium', 'gecko'];
+function buildWebext(browserEngine) {
+  const definitions = {
+    // Gecko currently doesn't support it:
+    // https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/optional_permissions#browser_compatibility
+    SUPPORTS_WEBEXT_OPTIONAL_BACKGROUND_PERMISSION: browserEngine === 'chromium',
+  };
   const outDir = 'build-webext';
   execSync(`rm -rf ${outDir} && mkdir ${outDir}`);
   execSync(`cp -r webext/. ${outDir}/`);
   execSync(`cp -r ${STATIC}/{${SHARED_FILES.join(',')}} ${outDir}/`, { shell: '/bin/bash' });
+  for (const [key, value] of Object.entries(definitions)) {
+    execSync(`sed -i "s/${key}/${value}/g" ${outDir}/popup.js`);
+  }
+  {
+    const manfestBasePath = `${outDir}/manifest_base.json`;
+    const manifest = JSON.parse(readFileSync(manfestBasePath, 'utf-8'));
+    if (definitions.SUPPORTS_WEBEXT_OPTIONAL_BACKGROUND_PERMISSION) {
+      manifest.optional_permissions = ['background'];
+    }
+    writeFileSync(
+      `${outDir}/manifest.json`,
+      JSON.stringify(manifest, undefined, '  '),
+      'utf-8'
+    );
+    execSync(`rm ${manfestBasePath}`);
+  }
   copyTranslations(outDir);
   concatJS(outDir, 'webext', 'snowflake.js', '');
   console.log('Webextension prepared.');
+}
+task('webext', 'build the webextension', function() {
+  const browserEngine = process.argv[3];
+  if (!(browserEngines.includes(browserEngine))) {
+    throw new Error(`You must provide browser engine string: ${browserEngines.join('|')}`);
+  }
+  buildWebext(browserEngine);
 });
 
 task('node', 'build the node binary', function() {
@@ -188,7 +217,9 @@ var updateVersion = function(file, version) {
 task('pack-webext', 'pack the webextension for deployment', function() {
   try {
     execSync(`rm -f source.zip`);
-    execSync(`rm -f build-webext.zip`);
+    for (const browserEngine of browserEngines) {
+      execSync(`rm -f build-webext-${browserEngine}.zip`);
+    }
   } catch (error) {
     //Usually this happens because the zip files were removed previously
     console.log('Error removing zip files');
@@ -197,7 +228,7 @@ task('pack-webext', 'pack the webextension for deployment', function() {
   var version = process.argv[3];
   console.log(version);
   updateVersion('./package.json', version);
-  updateVersion('./webext/manifest.json', version);
+  updateVersion('./webext/manifest_base.json', version);
   execSync(`git commit -am "bump version to ${version}"`);
   try {
     execSync(`git tag webext-${version}`);
@@ -205,13 +236,15 @@ task('pack-webext', 'pack the webextension for deployment', function() {
     console.log('Error creating git tag');
     // Revert changes
     execSync(`git reset HEAD~`);
-    execSync(`git checkout ./webext/manifest.json`);
+    execSync(`git checkout ./webext/manifest_base.json`);
     execSync(`git submodule update`);
     return;
   }
   execSync(`git archive -o source.zip HEAD .`);
-  execSync(`npm run webext`);
-  execSync(`cd build-webext && zip -Xr ../build-webext.zip ./*`);
+  for (const browserEngine of browserEngines) {
+    execSync(`npm run webext ${browserEngine}`);
+    execSync(`cd build-webext && zip -Xr ../build-webext-${browserEngine}.zip ./*`);
+  }
 });
 
 task('clean', 'remove all built files', function() {
