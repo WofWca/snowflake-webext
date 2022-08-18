@@ -39,6 +39,10 @@ function maybeChangeBackgroundPermission(enabledSetting, runInBackgroundSetting)
   });
 }
 
+// If you want to gonna change this to `false`, double-check everything as some code
+// may still be assuming it to be `true`.
+const DEFAULT_ENABLED = true;
+
 class WebExtUI extends UI {
 
   constructor() {
@@ -152,7 +156,7 @@ class WebExtUI extends UI {
         // eslint-disable-next-line no-undef
         && SUPPORTS_WEBEXT_OPTIONAL_BACKGROUND_PERMISSION
       ) {
-        new Promise(r => chrome.storage.local.get({ "snowflake-enabled": false }, r))
+        new Promise(r => chrome.storage.local.get({ "snowflake-enabled": DEFAULT_ENABLED }, r))
         .then(storage => {
           maybeChangeBackgroundPermission(storage["snowflake-enabled"], m.runInBackground);
         });
@@ -202,7 +206,7 @@ class WebExtUI extends UI {
 
 WebExtUI.prototype.port = null;
 
-WebExtUI.prototype.enabled = true;
+WebExtUI.prototype.enabled = DEFAULT_ENABLED;
 
 /*
 Entry point.
