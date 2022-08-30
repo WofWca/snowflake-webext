@@ -1,7 +1,7 @@
 {
   "name": "snowflake-pt",
   "version": "0.6.0",
-  "description": "Snowflake is a WebRTC pluggable transport for Tor.",
+  "description": "Allow users in censored countries to use your network connection to access the Tor network.",
   "main": "build/snowflake.js",
   "directories": {
     "test": "test"
