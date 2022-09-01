@@ -66,7 +66,7 @@
     "message": "Install the web extension"
   },
   "installWebExtension":{
-    "message": "The web extension is the easiest way to run a Snowflake proxy. Simply install it on <a href=\"https://addons.mozilla.org/en-US/firefox/addon/torproject-snowflake/\">Firefox</a> or <a href=\"https://chrome.google.com/webstore/detail/snowflake/mafpmfcccpbjnhfhjnllmmalhifmlcie\">Chrome</a>, enable the extension, and watch it turn green when a user connects through your proxy!"
+    "message": "The web extension is the easiest way to run a Snowflake proxy. Simply install it on <a href=\"https://addons.mozilla.org/en-US/firefox/addon/torproject-snowflake/\">Firefox</a> or <a href=\"https://chrome.google.com/webstore/detail/snowflake/mafpmfcccpbjnhfhjnllmmalhifmlcie\">Chrome</a>, enable the extension, and watch the icon turn green when a user connects through your proxy!"
   },
   "installFirefox": {
     "message": "Install in Firefox"
