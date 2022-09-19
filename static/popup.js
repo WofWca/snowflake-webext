@@ -64,8 +64,10 @@ class Popup {
     this.setChecked(true);
     if (clients > 0) {
       this.setStatusText(this.getMsgFunc('popupStatusOn', String(clients)));
+      this.active = true;
     } else {
       this.setStatusText(this.getMsgFunc('popupStatusReady'));
+      this.active = false;
     }
     this.setStatusDesc((total > 0) ? this.getMsgFunc('popupDescOn', String(total)) : '');
     this.setEnabled(true);
