@@ -113,6 +113,9 @@ class Snowflake {
             Math.max(this.pollInterval - this.config.pollAdjustment,
               this.config.defaultBrokerPollInterval);
           this.natFailures = 0;
+          if (this.ui.natType == "unrestricted") {
+            this.pollInterval = this.config.fastBrokerPollInterval;
+          }
         }
       }), this.config.datachannelTimeout);
     }, function () {

@@ -27,6 +27,7 @@ Config.prototype.rateLimitHistory = 5.0;
 Config.prototype.defaultBrokerPollInterval = 60.0 * 1000; //1 poll every minutes
 Config.prototype.slowestBrokerPollInterval = 6 * 60 * 60.0 * 1000; //1 poll every 6 hours
 Config.prototype.pollAdjustment = 100.0 * 1000;
+Config.prototype.fastBrokerPollInterval = 30 * 1000; //1 poll every 30 seconds
 
 // Recheck our NAT type once every 2 days
 Config.prototype.natCheckInterval = 2 * 24 * 60 * 60 * 1000;
