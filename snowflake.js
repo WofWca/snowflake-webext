@@ -105,6 +105,7 @@ class Snowflake {
             this.ui.natType = "restricted";
             console.log("Learned NAT type: restricted");
             this.natFailures = 0;
+            this.config.maxNumClients = 1;
           }
           this.broker.setNATType(this.ui.natType);
         } else {
@@ -115,6 +116,7 @@ class Snowflake {
           this.natFailures = 0;
           if (this.ui.natType == "unrestricted") {
             this.pollInterval = this.config.fastBrokerPollInterval;
+            this.config.maxNumClients = 2;
           }
         }
       }), this.config.datachannelTimeout);
