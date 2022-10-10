@@ -57,7 +57,7 @@
     "message": "Help people circumvent censorship: operate a Snowflake proxy"
   },
   "installExtension": {
-    "message": "Did you know that Snowflake proxies are operated entirely by volunteers? In other words, a user gets matched with a random Snowflake volunteer proxy is run by a volunteer like you! So, if you want to help people bypass censorship, consider installing and running a Snowflake proxy. The only prerequisite is that the Internet in your country is <strong>not</strong> heavily censored already."
+    "message": "Did you know that Snowflake proxies are operated entirely by volunteers? In other words, a user gets matched with a random Snowflake volunteer proxy, which is run by a volunteer like you! So, if you want to help people bypass censorship, consider installing and running a Snowflake proxy. The only prerequisite is that the Internet in your country is <strong>not</strong> heavily censored already."
   },
   "volunteer": {
     "message": "You can join thousands of volunteers from around the world who have a Snowflake proxy installed and running. There is no need to worry about which websites people are accessing through your Snowflake proxy. Their visible browsing IP address will match their Tor exit node, not yours."
