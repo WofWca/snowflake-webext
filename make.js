@@ -109,7 +109,7 @@ var fillIndex = function(outDir) {
   var indexFile = `${outDir}/index.html`;
   var html = readFileSync(indexFile, 'utf8');
   var dom = domino.createDocument(html);
-  var locales = require(`./static/_locales/en_US/messages.json`);
+  var locales = require(`./static/_locales/en_US/website.json`);
   fill(dom.body, function(m) {
     return locales[m].message;
   });

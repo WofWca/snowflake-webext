@@ -57,7 +57,7 @@ var fill = function(n, func) {
 };
 
 let gotLang = getLang();
-fetch(`./_locales/${gotLang}/messages.json`)
+fetch(`./_locales/${gotLang}/website.json`)
 .then((res) => {
   if (!res.ok) { return; }
   return res.json();

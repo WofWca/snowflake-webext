@@ -247,7 +247,7 @@ var
   };
 
   window.onload = function() {
-    fetch(`./_locales/${getLang()}/messages.json`)
+    fetch(`./_locales/${getLang()}/badge.json`)
     .then((res) => {
       if (!res.ok) { return; }
       return res.json();
