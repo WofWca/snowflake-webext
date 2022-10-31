@@ -65,6 +65,9 @@ fetch(`./_locales/${gotLang}/website.json`)
 .then((json) => {
   var language = document.getElementById('language-switcher');
   var lang = `${gotLang}`;
+  if ((lang == "ar") || (lang == "fa")) {
+    document.body.setAttribute('style', 'text-align:right');
+  }
   language.innerText = `${availableLangs.get(lang)} (${lang})`;
   var messages = new Messages(json);
   fill(document.body, (m) => {
