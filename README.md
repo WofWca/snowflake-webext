@@ -118,7 +118,7 @@ npm run clean
 # Maybe check what's left behind
 git clean -n -d -x
 
-# Be sure that website.json and badge.json in translation/en/ have been
+# Be sure that website.json and messages.json in translation/en/ have been
 # populated with any new strings that may have been merged in the recent
 # patches.  It may take some time for weblate to have updated.  You can
 # check with the following,
