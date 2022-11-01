@@ -124,6 +124,13 @@ git clean -n -d -x
 # check with the following,
 git submodule update --remote
 
+# We manage the translations we include manually. These translations are
+# tracked separately for the website and the badge. Visit weblate to see
+# the percentage completion for each language and update `websiteLangs`
+# and `badgeLangs` in `make.js` accordingly. The links for weblate are:
+# https://hosted.weblate.org/projects/tor/snowflake-badge/
+# https://hosted.weblate.org/projects/tor/snowflake-website/
+
 # But note that it's also run as part of the "pack-webext" script, so return
 # it to previously committed state,
 git submodule update

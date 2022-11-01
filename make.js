@@ -2,7 +2,43 @@
 
 /* global require, process */
 
-var { writeFileSync, readFileSync, readdirSync, statSync } = require('fs');
+const websiteLangs = [
+  'en_US',
+  'sq',
+  'zh_CN',
+  'cs',
+  'ka',
+  'de',
+  'el',
+  'it',
+  'fa',
+  'pl',
+  'ro',
+  'es',
+  'sv_SE',
+  'tr',
+  'uk',
+];
+
+const badgeLangs = [
+  'en_US',
+  'sq',
+  'zh_CN',
+  'cs',
+  'ka',
+  'de',
+  'el',
+  'it',
+  'fa',
+  'pl',
+  'ro',
+  'es',
+  'sv_SE',
+  'tr',
+  'uk',
+];
+
+var { writeFileSync, readFileSync } = require('fs');
 var { execSync, spawn } = require('child_process');
 var cldr = require('cldr');
 var domino = require('domino');
@@ -49,9 +85,17 @@ var concatJS = function(outDir, init, outFile, pre) {
   execSync(`cat ${files.join(' ')} >> ${outPath}`);
 };
 
-var copyTranslations = function(outDir) {
+var copyTranslations = function(outDir, type) {
+  var langs = [];
+  if (type === "badge") {
+    langs = badgeLangs;
+  } else {
+    langs = websiteLangs;
+  }
   execSync('git submodule update --init -- translation');
-  execSync(`cp -rf translation/* ${outDir}/_locales/`);
+  for (const lang of langs) {
+    execSync(`cp -rf translation/${lang} ${outDir}/_locales/`);
+  }
 };
 
 var getDisplayName = function(locale) {
@@ -68,21 +112,16 @@ var getDisplayName = function(locale) {
   return name;
 };
 
-var getDirs = function() {
-  let dirs = readdirSync('translation').filter((f) => {
-    const s = statSync(`translation/${f}`);
-    return s.isDirectory() && !/^(\.|en)/.test(f);
-  });
-  dirs.push('en_US');
-  dirs.sort();
-  return dirs;
-};
-
-var translatedLangs = function() {
+var translatedLangs = function(type) {
+  var langs = [];
+  if (type === "badge") {
+    langs = badgeLangs;
+  } else {
+    langs = websiteLangs;
+  }
   let out = "const availableLangs = new Map([\n";
-  let dirs = getDirs();
-  dirs = dirs.map(d => `['${d}', '${getDisplayName(d)}'],`);
-  out += dirs.join("\n");
+  langs = langs.map(d => `['${d}', '${getDisplayName(d)}'],`);
+  out += langs.join("\n");
   out += "\n]);\n\n";
   return out;
 };
@@ -155,9 +194,9 @@ task('build', 'build the snowflake proxy', function() {
   execSync(`rm -rf ${outDir}`);
   execSync(`cp -r ${STATIC}/ ${outDir}/`);
   addVersion(outDir);
-  copyTranslations(outDir);
-  concatJS(outDir, 'badge', 'embed.js', translatedLangs());
-  writeFileSync(`${outDir}/index.js`, translatedLangs(), 'utf8');
+  copyTranslations(outDir, "badge");
+  concatJS(outDir, 'badge', 'embed.js', translatedLangs("badge"));
+  writeFileSync(`${outDir}/index.js`, translatedLangs("website"), 'utf8');
   execSync(`cat ${STATIC}/index.js >> ${outDir}/index.js`);
   fillIndex(outDir);
   console.log('Snowflake prepared.');
@@ -187,7 +226,7 @@ function buildWebext(browserEngine) {
     );
     execSync(`rm ${manfestBasePath}`);
   }
-  copyTranslations(outDir);
+  copyTranslations(outDir, "website");
   concatJS(outDir, 'webext', 'snowflake.js', '');
   for (const [key, value] of Object.entries(definitions)) {
     const commandStart = `sed -i "s/${key}/${value}/g" ${outDir}`;
