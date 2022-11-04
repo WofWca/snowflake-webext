@@ -51,22 +51,21 @@ class Broker {
         if (xhr.DONE !== xhr.readyState) {
           return;
         }
-        switch (xhr.status) {
-          case Broker.CODE.OK: {
-            const response = JSON.parse(xhr.responseText);
-            if (response.Status == Broker.STATUS.MATCH) {
-              return fulfill(response); // Should contain offer.
-            } else if (response.Status == Broker.STATUS.TIMEOUT) {
-              return reject(Broker.MESSAGE.TIMEOUT);
-            } else {
-              log('Broker ERROR: Unexpected ' + response.Status);
-              return reject(Broker.MESSAGE.UNEXPECTED);
-            }
+        if (xhr.status !== Broker.CODE.OK) {
+          log('Broker ERROR: Unexpected ' + xhr.status + ' - ' + xhr.statusText);
+          snowflake.ui.setStatus(' failure. Please refresh.');
+          reject(Broker.MESSAGE.UNEXPECTED);
+          return;
+        }
+        const response = JSON.parse(xhr.responseText);
+        switch (response.Status) {
+          case Broker.STATUS.MATCH: fulfill(response); return;
+          case Broker.STATUS.TIMEOUT: reject(Broker.MESSAGE.TIMEOUT); return;
+          default: {
+            log('Broker ERROR: Unexpected ' + response.Status);
+            reject(Broker.MESSAGE.UNEXPECTED);
+            return;
           }
-          default:
-            log('Broker ERROR: Unexpected ' + xhr.status + ' - ' + xhr.statusText);
-            snowflake.ui.setStatus(' failure. Please refresh.');
-            return reject(Broker.MESSAGE.UNEXPECTED);
         }
       };
       this._xhr = xhr; // Used by spec to fake async Broker interaction
