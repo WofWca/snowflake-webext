@@ -84,9 +84,8 @@ describe('ProxyPair', function() {
       type: 'offer',
       sdp: 'foo'
     });
-    pp.pc.onicecandidate({
-      candidate: null
-    });
+    pp.pc.iceGatheringState = 'complete';
+    pp.pc.onicegatheringstatechange();
     expect(snowflake.broker.sendAnswer).toHaveBeenCalled();
   });
 

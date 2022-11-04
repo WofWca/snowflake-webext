@@ -69,12 +69,11 @@ class ProxyPair {
     const onceSendAnswer = () => {
       snowflake.broker.sendAnswer(this.id, this.pc.localDescription);
 
-      this.pc.onicecandidate = null;
+      this.pc.onicegatheringstatechange = null;
       clearTimeout(this.answerTimeoutId);
     };
-    this.pc.onicecandidate = (evt) => {
-      // Browser sends a null candidate once the ICE gathering completes.
-      if (null === evt.candidate && this.pc.connectionState !== 'closed') {
+    this.pc.onicegatheringstatechange = () => {
+      if (this.pc.iceGatheringState === 'complete' && this.pc.connectionState !== 'closed') {
         dbg('Finished gathering ICE candidates.');
         onceSendAnswer();
       }
