@@ -38,12 +38,14 @@ class ProxyPair {
 
   /** Prepare a WebRTC PeerConnection and await for an SDP offer. */
   begin() {
+    /** @private */
     this.pc = new RTCPeerConnection(this.pcConfig);
     // OnDataChannel triggered remotely from the client when connection succeeds.
     this.pc.ondatachannel = (dc) => {
       const channel = dc.channel;
       dbg('Data Channel established...');
       this.prepareDataChannel(channel);
+      /** @private */
       this.client = channel;
     };
   }
@@ -113,6 +115,7 @@ class ProxyPair {
   /**
    * Given a WebRTC DataChannel, prepare callbacks.
    * @param {RTCDataChannel} channel
+   * @private
    */
   prepareDataChannel(channel) {
     // if we don't receive any keep-alive messages from the client, close the
@@ -155,7 +158,10 @@ class ProxyPair {
     channel.onmessage = this.onClientToRelayMessage;
   }
 
-  /** Assumes WebRTC datachannel is connected. */
+  /**
+   * Assumes WebRTC datachannel is connected.
+   * @private
+   */
   connectRelay() {
     dbg('Connecting to relay...');
     // Get a remote IP address from the PeerConnection, if possible. Add it to
@@ -203,6 +209,7 @@ class ProxyPair {
   /**
    * WebRTC --> websocket
    * @param {MessageEvent} msg
+   * @private
    */
   onClientToRelayMessage(msg) {
     dbg('WebRTC --> websocket data: ' + msg.data.byteLength + ' bytes');
@@ -215,6 +222,7 @@ class ProxyPair {
   /**
    * websocket --> WebRTC
    * @param {MessageEvent} event
+   * @private
    */
   onRelayToClientMessage(event) {
     dbg('websocket --> WebRTC data: ' + event.data.byteLength + ' bytes');
@@ -222,6 +230,7 @@ class ProxyPair {
     this.flush();
   }
 
+  /** @private */
   onError(event) {
     const ws = event.target;
     log(ws.label + ' error.');
@@ -245,7 +254,10 @@ class ProxyPair {
     this.onCleanup();
   }
 
-  /** Send as much data in both directions as the rate limit currently allows. */
+  /**
+   * Send as much data in both directions as the rate limit currently allows.
+   * @private
+   */
   flush() {
     let busy = true;
     while (busy && !this.rateLimit.isLimited()) {

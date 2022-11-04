@@ -62,6 +62,7 @@ class Snowflake {
   /**
    * Regularly poll Broker for clients to serve until this snowflake is
    * serving at capacity, at which point stop polling.
+   * @private
    */
   pollBroker() {
     // Poll broker for clients.
@@ -133,6 +134,7 @@ class Snowflake {
    * @param {string} desc
    * @param {string | undefined} relayURL
    * @returns {boolean} `true` on success, `false` on fail.
+   * @private
    */
   receiveOffer(pair, desc, relayURL) {
     try {
@@ -167,6 +169,7 @@ class Snowflake {
 
   /**
    * @returns {ProxyPair}
+   * @private
    */
   makeProxyPair() {
     const pair = new ProxyPair(this.relayAddr, this.rateLimit, this.config);
@@ -199,6 +202,7 @@ class Snowflake {
    * @param {string} pattern
    * @param {string} str typically a domain name to be checked
    * @return {boolean}
+   * @private
    */
   checkRelayPattern(pattern, str) {
     if (typeof pattern !== "string") {
