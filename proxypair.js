@@ -66,6 +66,16 @@ class ProxyPair {
     }
     dbg('SDP ' + offer.type + ' successfully received.');
 
+    this.pc.createAnswer()
+    .then((sdp) => {
+      dbg('webrtc: Answer ready.');
+      return this.pc.setLocalDescription(sdp);
+    })
+    .catch(() => {
+      this.close();
+      dbg('webrtc: Failed to create or set Answer');
+    });
+
     // Send the answer when ready.
     const onceSendAnswer = () => {
       sendAnswer(this.pc.localDescription);

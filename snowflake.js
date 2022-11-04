@@ -154,37 +154,15 @@ class Snowflake {
       const offer = JSON.parse(desc);
       dbg('Received:\n\n' + offer.sdp + '\n');
       const sdp = new RTCSessionDescription(offer);
-      if (
-        pair.receiveWebRTCOffer(
-          sdp,
-          answer => this.broker.sendAnswer(pair.id, answer)
-        )
-      ) {
-        this.sendAnswer(pair);
-        return true;
-      } else {
-        return false;
-      }
+      const result = pair.receiveWebRTCOffer(
+        sdp,
+        answer => this.broker.sendAnswer(pair.id, answer)
+      );
+      return result;
     } catch (e) {
       log('ERROR: Unable to receive Offer: ' + e);
       return false;
     }
-  }
-
-  /**
-   * @param {ProxyPair} pair
-   */
-  sendAnswer(pair) {
-    /** @param {RTCLocalSessionDescriptionInit} sdp */
-    const next = function (sdp) {
-      dbg('webrtc: Answer ready.');
-      pair.pc.setLocalDescription(sdp).catch(fail);
-    };
-    const fail = function () {
-      pair.close();
-      dbg('webrtc: Failed to create or set Answer');
-    };
-    pair.pc.createAnswer().then(next).catch(fail);
   }
 
   /**

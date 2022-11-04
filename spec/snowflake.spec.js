@@ -9,6 +9,12 @@ class RTCPeerConnection {
   setRemoteDescription() {
     return true;
   }
+  createAnswer() {
+    return Promise.resolve('foo');
+  }
+  setLocalDescription() {
+    return Promise.resolve();
+  }
   send() {}
 }
 
@@ -38,6 +44,7 @@ class FakeBroker {
   }
   setNATType(natType) {
   }
+  sendAnswer() {}
 }
 
 describe('Snowflake', function() {
@@ -68,27 +75,34 @@ describe('Snowflake', function() {
   });
 
   it('receives SDP offer and sends answer', function() {
-    var pair, s;
-    s = new Snowflake(config, ui, new FakeBroker());
+    var broker, pair, s;
+    broker = new FakeBroker();
+    s = new Snowflake(config, ui, broker);
     pair = {
-      receiveWebRTCOffer: function() {}
+      id: 'foo',
+      receiveWebRTCOffer: function(_offer, sendAnswer) {
+        sendAnswer('bar');
+        return true;
+      }
     };
-    spyOn(pair, 'receiveWebRTCOffer').and.returnValue(true);
-    spyOn(s, 'sendAnswer');
+    spyOn(broker, 'sendAnswer');
     s.receiveOffer(pair, '{"type":"offer","sdp":"foo"}');
-    expect(s.sendAnswer).toHaveBeenCalled();
+    expect(broker.sendAnswer).toHaveBeenCalled();
   });
 
   it('does not send answer when receiving invalid offer', function() {
-    var pair, s;
-    s = new Snowflake(config, ui, new FakeBroker());
+    var broker, pair, s;
+    broker = new FakeBroker();
+    s = new Snowflake(config, ui, broker);
     pair = {
-      receiveWebRTCOffer: function() {}
+      id: 'foo',
+      receiveWebRTCOffer: function(_offer, sendAnswer) {
+        return false;
+      }
     };
-    spyOn(pair, 'receiveWebRTCOffer').and.returnValue(false);
-    spyOn(s, 'sendAnswer');
+    spyOn(broker, 'sendAnswer');
     s.receiveOffer(pair, '{"type":"not a good offer","sdp":"foo"}');
-    expect(s.sendAnswer).not.toHaveBeenCalled();
+    expect(broker.sendAnswer).not.toHaveBeenCalled();
   });
 
   it('can make a proxypair', function() {
