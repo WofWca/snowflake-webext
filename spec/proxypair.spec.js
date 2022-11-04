@@ -80,10 +80,13 @@ describe('ProxyPair', function() {
 
   it('responds with a WebRTC answer correctly', function() {
     spyOn(snowflake.broker, 'sendAnswer');
-    pp.receiveWebRTCOffer({
-      type: 'offer',
-      sdp: 'foo'
-    });
+    pp.receiveWebRTCOffer(
+      {
+        type: 'offer',
+        sdp: 'foo'
+      },
+      answer => snowflake.broker.sendAnswer(pp.id, answer),
+    );
     pp.pc.iceGatheringState = 'complete';
     pp.pc.onicegatheringstatechange();
     expect(snowflake.broker.sendAnswer).toHaveBeenCalled();

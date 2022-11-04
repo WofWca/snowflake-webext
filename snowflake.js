@@ -154,7 +154,12 @@ class Snowflake {
       const offer = JSON.parse(desc);
       dbg('Received:\n\n' + offer.sdp + '\n');
       const sdp = new RTCSessionDescription(offer);
-      if (pair.receiveWebRTCOffer(sdp)) {
+      if (
+        pair.receiveWebRTCOffer(
+          sdp,
+          answer => this.broker.sendAnswer(pair.id, answer)
+        )
+      ) {
         this.sendAnswer(pair);
         return true;
       } else {

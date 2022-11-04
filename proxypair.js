@@ -50,9 +50,10 @@ class ProxyPair {
 
   /**
    * @param {RTCSessionDescription} offer
+   * @param {(answer: RTCSessionDescription) => void} sendAnswer
    * @returns {boolean} `true` on success, `false` on fail.
    */
-  receiveWebRTCOffer(offer) {
+  receiveWebRTCOffer(offer, sendAnswer) {
     if ('offer' !== offer.type) {
       log('Invalid SDP received -- was not an offer.');
       return false;
@@ -67,7 +68,7 @@ class ProxyPair {
 
     // Send the answer when ready.
     const onceSendAnswer = () => {
-      snowflake.broker.sendAnswer(this.id, this.pc.localDescription);
+      sendAnswer(this.pc.localDescription);
 
       this.pc.onicegatheringstatechange = null;
       clearTimeout(this.answerTimeoutId);
