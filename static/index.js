@@ -1,4 +1,5 @@
 /* global availableLangs */
+const RTL_LANGS = new Set(["ar", "fa", "he", "ur"]);
 
 class Messages {
   constructor(json) {
@@ -39,6 +40,14 @@ var getLang = function() {
   return defaultLang;
 };
 
+var set_lang_direction = function(l) {
+  if (RTL_LANGS.has(l)) {
+    document.documentElement.dir = "rtl";
+  } else {
+    document.documentElement.dir = "ltr";
+  }
+};
+
 var fill = function(n, func) {
   switch(n.nodeType) {
     case 1:  // Node.ELEMENT_NODE
@@ -65,11 +74,7 @@ fetch(`./_locales/${gotLang}/website.json`)
 .then((json) => {
   var language = document.getElementById('language-switcher');
   var lang = `${gotLang}`;
-  if (lang == "ar" || lang == "fa" || lang == "he" || lang == "ur") {
-    document.documentElement.dir = "rtl";
-  } else {
-    document.documentElement.dir = "ltr";
-  } 
+  set_lang_direction(lang);
   language.innerText = `${availableLangs.get(lang)} (${lang})`;
   var messages = new Messages(json);
   fill(document.body, (m) => {
