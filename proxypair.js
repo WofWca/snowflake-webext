@@ -41,8 +41,7 @@ class ProxyPair {
     /** @private */
     this.pc = new RTCPeerConnection(this.pcConfig);
     // OnDataChannel triggered remotely from the client when connection succeeds.
-    this.pc.ondatachannel = (dc) => {
-      const channel = dc.channel;
+    this.pc.ondatachannel = ({ channel }) => {
       dbg('Data Channel established...');
       this.prepareDataChannel(channel);
       /** @private */
