@@ -53,23 +53,21 @@ class Snowflake {
    * process. `pollBroker` automatically arranges signalling.
    */
   beginWebRTC() {
-    this.pollBroker();
+    if (this.proxyPairs.length < this.config.maxNumClients) {
+      this.pollBroker();
+    } else {
+      dbg('Polling skipped: at client capacity.');
+    }
     this.pollTimeoutId = setTimeout((() => {
       this.beginWebRTC();
     }), this.pollInterval);
   }
 
   /**
-   * Regularly poll Broker for clients to serve until this snowflake is
-   * serving at capacity, at which point stop polling.
+   * Try to get a client from the broker and start serving it upon success.
    * @private
    */
   pollBroker() {
-    // Poll broker for clients.
-    if (this.proxyPairs.length >= this.config.maxNumClients) {
-      dbg('Polling skipped: at client capacity.');
-      return;
-    }
     const pair = this.makeProxyPair();
     log('Polling broker..');
     let msg = 'Polling for client ... ';
