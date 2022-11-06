@@ -67,7 +67,7 @@ class Snowflake {
   pollBroker() {
     // Poll broker for clients.
     if (this.proxyPairs.length >= this.config.maxNumClients) {
-      log('At client capacity.');
+      dbg('Polling skipped: at client capacity.');
       return;
     }
     const pair = this.makeProxyPair();
