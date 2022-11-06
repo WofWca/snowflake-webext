@@ -179,13 +179,13 @@ class ProxyPair {
       (this.relayURL === undefined) ?
         WS.makeWebsocket(this.relayAddr, params) :
         WS.makeWebsocketFromURL(this.relayURL, params);
-    this.relay.label = 'websocket-relay';
-    this.relay.onopen = () => {
+    relay.label = 'websocket-relay';
+    relay.onopen = () => {
       clearTimeout(this.connectToRelayTimeoutId);
       log(relay.label + ' connected!');
       snowflake.ui.setStatus('connected');
     };
-    this.relay.onclose = () => {
+    relay.onclose = () => {
       log(relay.label + ' closed.');
       snowflake.ui.setStatus('disconnected.');
       if (this.counted) {
@@ -195,8 +195,8 @@ class ProxyPair {
       this.flush();
       this.close();
     };
-    this.relay.onerror = this.onError;
-    this.relay.onmessage = this.onRelayToClientMessage;
+    relay.onerror = this.onError;
+    relay.onmessage = this.onRelayToClientMessage;
     // TODO: Better websocket timeout handling.
     this.connectToRelayTimeoutId = setTimeout((() => {
       log(relay.label + ' timed out connecting.');
