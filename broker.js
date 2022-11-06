@@ -42,6 +42,7 @@ class Broker {
    * Registers this Snowflake with the broker using an HTTP POST request, and
    * waits for a response containing some client offer that the Broker chooses
    * for this proxy..
+   * Rejects on timeout or on error.
    * TODO: Actually support multiple clients.
    */
   getClientOffer(id, numClientsConnected) {

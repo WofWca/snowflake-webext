@@ -69,14 +69,17 @@ class Snowflake {
   pollBroker() {
     const pair = this.makeProxyPair();
     log('Polling broker..');
+
     let msg = 'Polling for client ... ';
     if (this.retries > 0) {
       msg += '[retries: ' + this.retries + ']';
     }
     this.ui.setStatus(msg);
+
     //update NAT type
     console.log("NAT type: " + this.ui.natType);
     this.broker.setNATType(this.ui.natType);
+
     const recv = this.broker.getClientOffer(pair.id, this.proxyPairs.length);
     recv.then((resp) => {
       const clientNAT = resp.NAT;
