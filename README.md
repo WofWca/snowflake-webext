@@ -198,7 +198,7 @@ var broker = new Broker(config.brokerUrl);
 var snowflake = new Snowflake(config, ui, broker);
 
 snowflake.setRelayAddr(config.relayAddr);
-snowflake.beginWebRTC();
+snowflake.beginServingClients();
 ```
 
 This minimal setup is pretty much what's currently in `init-node.js`.

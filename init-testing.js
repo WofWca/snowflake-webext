@@ -118,7 +118,7 @@ var
     // Otherwise, begin setting up WebRTC and acting as a proxy.
     dbg('Contacting Broker at ' + broker.url);
     snowflake.setRelayAddr(config.relayAddr);
-    return snowflake.beginWebRTC();
+    return snowflake.beginServingClients();
   };
 
   // Notification of closing tab with active proxy.

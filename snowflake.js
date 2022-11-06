@@ -49,17 +49,16 @@ class Snowflake {
   }
 
   /**
-   * Initialize WebRTC PeerConnection, which requires beginning the signalling
-   * process. `pollBroker` automatically arranges signalling.
+   * Start asking the broker for clients and serving them.
    */
-  beginWebRTC() {
+  beginServingClients() {
     if (this.proxyPairs.length < this.config.maxNumClients) {
       this.pollBroker();
     } else {
       dbg('Polling skipped: at client capacity.');
     }
     this.pollTimeoutId = setTimeout((() => {
-      this.beginWebRTC();
+      this.beginServingClients();
     }), this.pollInterval);
   }
 

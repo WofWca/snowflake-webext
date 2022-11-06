@@ -69,7 +69,7 @@ describe('Snowflake', function() {
     var s;
     s = new Snowflake(config, ui, new FakeBroker());
     spyOn(s.broker, 'getClientOffer').and.callThrough();
-    s.beginWebRTC();
+    s.beginServingClients();
     expect(s.retries).toBe(1);
     expect(s.broker.getClientOffer).toHaveBeenCalled();
   });
