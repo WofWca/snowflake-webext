@@ -72,7 +72,6 @@ class Snowflake {
     }
     const pair = this.makeProxyPair();
     log('Polling broker..');
-    // Do nothing until a new proxyPair is available.
     let msg = 'Polling for client ... ';
     if (this.retries > 0) {
       msg += '[retries: ' + this.retries + ']';
