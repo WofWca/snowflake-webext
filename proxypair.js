@@ -117,23 +117,22 @@ class ProxyPair {
    * @private
    */
   prepareDataChannel(channel) {
-    // if we don't receive any keep-alive messages from the client, close the
-    // connection
-    const onStaleTimeout = () => {
-      console.log("Closing stale connection.");
-      this.flush();
-      this.close();
-    };
-    this.refreshStaleTimeout = () => {
-      clearTimeout(this.messageTimer);
-      this.messageTimer = setTimeout(onStaleTimeout, this.config.messageTimeout);
-    };
-
     channel.onopen = () => {
       log('WebRTC DataChannel opened!');
       snowflake.ui.increaseClients();
       this.counted = true;
 
+      // if we don't receive any keep-alive messages from the client, close the
+      // connection
+      const onStaleTimeout = () => {
+        console.log("Closing stale connection.");
+        this.flush();
+        this.close();
+      };
+      this.refreshStaleTimeout = () => {
+        clearTimeout(this.messageTimer);
+        this.messageTimer = setTimeout(onStaleTimeout, this.config.messageTimeout);
+      };
       this.refreshStaleTimeout();
 
       // This is the point when the WebRTC datachannel is done, so the next step
