@@ -1,4 +1,4 @@
-/* global snowflake, log, dbg, Util, Parse, WS */
+/* global snowflake, log, dbg, debug, Util, Parse, WS */
 
 /**
 Represents a single:
@@ -235,6 +235,32 @@ class ProxyPair {
 
   /** Close both WebRTC and websocket. */
   close() {
+    if (debug) {
+      this.pc.getStats().then(report => {
+        let transportStats;
+        for (const stat of report.values()) {
+          // Also consider 'data-channel'.
+          if (stat.type === 'transport') {
+            transportStats = stat;
+            break;
+          }
+        }
+        if (!transportStats) {
+          return;
+        }
+        function bytesToMBytesStr(numBytes) {
+          return (numBytes / 1024 / 1024).toFixed(3);
+        }
+        log(
+          `Connection closed. Traffic (up|down):`
+          + ` ${bytesToMBytesStr(transportStats.bytesReceived)} MB|`
+          + `${bytesToMBytesStr(transportStats.bytesSent)} MB`
+          + `, packets: ${transportStats.packetsReceived}|`
+          + `${transportStats.packetsSent}`
+        );
+      });
+    }
+
     clearTimeout(this.connectToRelayTimeoutId);
     clearTimeout(this.messageTimer);
     clearTimeout(this.answerTimeoutId);
