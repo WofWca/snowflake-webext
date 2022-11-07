@@ -210,7 +210,6 @@ class ProxyPair {
    * @private
    */
   onClientToRelayMessage(msg) {
-    dbg('WebRTC --> websocket data: ' + msg.data.byteLength + ' bytes');
     this.c2rSchedule.push(msg.data);
     this.flush();
 
@@ -223,7 +222,6 @@ class ProxyPair {
    * @private
    */
   onRelayToClientMessage(event) {
-    dbg('websocket --> WebRTC data: ' + event.data.byteLength + ' bytes');
     this.r2cSchedule.push(event.data);
     this.flush();
   }
