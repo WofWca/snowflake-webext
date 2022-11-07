@@ -38,6 +38,12 @@ Config.prototype.datachannelTimeout = 20 * 1000;
 // Timeout to close proxypair if no messages are sent
 Config.prototype.messageTimeout = 30 * 1000;
 
+// This must be smaller than the clien't timeout (`ClientTimeout`)
+// (which is 10 seconds by default as of now), otherwise the client would be
+// gone before we send the answer.
+// And it, obviously, must be smaller than `datachannelTimeout`.
+Config.prototype.answerTimeout = 6 * 1000;
+
 Config.prototype.maxNumClients = 1;
 
 Config.prototype.proxyType = "";

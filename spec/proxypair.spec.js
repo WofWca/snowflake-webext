@@ -80,6 +80,10 @@ describe('ProxyPair', function() {
 
   it('responds with a WebRTC answer correctly', function() {
     spyOn(snowflake.broker, 'sendAnswer');
+    pp.receiveWebRTCOffer({
+      type: 'offer',
+      sdp: 'foo'
+    });
     pp.pc.onicecandidate({
       candidate: null
     });

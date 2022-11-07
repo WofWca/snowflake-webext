@@ -39,13 +39,6 @@ class ProxyPair {
   /** Prepare a WebRTC PeerConnection and await for an SDP offer. */
   begin() {
     this.pc = new RTCPeerConnection(this.pcConfig);
-    this.pc.onicecandidate = (evt) => {
-      // Browser sends a null candidate once the ICE gathering completes.
-      if (null === evt.candidate && this.pc.connectionState !== 'closed') {
-        dbg('Finished gathering ICE candidates.');
-        snowflake.broker.sendAnswer(this.id, this.pc.localDescription);
-      }
-    };
     // OnDataChannel triggered remotely from the client when connection succeeds.
     this.pc.ondatachannel = (dc) => {
       const channel = dc.channel;
@@ -71,6 +64,39 @@ class ProxyPair {
       return false;
     }
     dbg('SDP ' + offer.type + ' successfully received.');
+
+    // Send the answer when ready.
+    const onceSendAnswer = () => {
+      snowflake.broker.sendAnswer(this.id, this.pc.localDescription);
+
+      this.pc.onicecandidate = null;
+      clearTimeout(this.answerTimeoutId);
+    };
+    this.pc.onicecandidate = (evt) => {
+      // Browser sends a null candidate once the ICE gathering completes.
+      if (null === evt.candidate && this.pc.connectionState !== 'closed') {
+        dbg('Finished gathering ICE candidates.');
+        onceSendAnswer();
+      }
+    };
+    if (this.pc.iceGatheringState === 'complete') {
+      // This probably never happens as we've `setRemoteDescription` just now,
+      // but let's play it safe.
+      onceSendAnswer();
+    } else {
+      this.answerTimeoutId = setTimeout(() => {
+        dbg('answerTimeout');
+        // ICE gathering is taking a while to complete - send what we got so far.
+        if (!this.pc.localDescription) {
+          // We don't have anything to send yet. Sigh. The client will probably timeout waiting
+          // for us, but let's not bail and just try to wait some more in hope that it won't.
+          // Worst case scenario - `datachannelTimeout` callback will run.
+          return;
+        }
+        onceSendAnswer();
+      }, this.config.answerTimeout);
+    }
+
     return true;
   }
 
@@ -196,6 +222,7 @@ class ProxyPair {
   close() {
     clearTimeout(this.connectToRelayTimeoutId);
     clearTimeout(this.messageTimer);
+    clearTimeout(this.answerTimeoutId);
     if (this.webrtcIsReady()) {
       this.client.close();
     }
@@ -274,6 +301,7 @@ ProxyPair.prototype.relay = null; // websocket
 
 ProxyPair.prototype.connectToRelayTimeoutId = 0;
 ProxyPair.prototype.messageTimer = 0;
+ProxyPair.prototype.answerTimeoutId = 0;
 ProxyPair.prototype.flush_timeout_id = null;
 
 ProxyPair.prototype.onCleanup = null;
