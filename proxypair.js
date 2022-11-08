@@ -312,13 +312,6 @@ class ProxyPair {
     return (null !== this.relay) && (WebSocket.OPEN === this.relay.readyState);
   }
 
-  /**
-   * @param {WebSocket} ws
-   */
-  isClosed(ws) {
-    return undefined === ws || WebSocket.CLOSED === ws.readyState;
-  }
-
   peerConnOpen() {
     return (null !== this.pc) && ('closed' !== this.pc.connectionState);
   }
