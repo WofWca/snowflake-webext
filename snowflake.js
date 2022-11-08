@@ -134,7 +134,7 @@ class Snowflake {
           log('incorrect relay url protocol');
           return false;
         }
-        if (!this.checkRelayPattern(this.config.allowedRelayPattern, hostname)) {
+        if (!Snowflake.checkRelayPattern(this.config.allowedRelayPattern, hostname)) {
           log('relay url hostname does not match allowed pattern');
           return false;
         }
@@ -192,7 +192,7 @@ class Snowflake {
    * @return {boolean}
    * @private
    */
-  checkRelayPattern(pattern, str) {
+  static checkRelayPattern(pattern, str) {
     if (typeof pattern !== "string") {
       throw 'invalid checkRelayPattern input: pattern';
     }
