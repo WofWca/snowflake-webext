@@ -7,10 +7,7 @@ class Config {
 
 Config.prototype.brokerUrl = 'snowflake-broker.freehaven.net';
 
-Config.prototype.relayAddr = {
-  host: 'snowflake.freehaven.net',
-  port: '443'
-};
+Config.prototype.defaultRelayAddr = 'wss://snowflake.freehaven.net';
 
 // Original non-wss relay:
 // host: '192.81.135.242'

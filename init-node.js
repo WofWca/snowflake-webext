@@ -22,6 +22,4 @@ log('== snowflake proxy ==');
 
 dbg('Contacting Broker at ' + broker.url);
 
-snowflake.setRelayAddr(config.relayAddr);
-
 snowflake.beginServingClients();

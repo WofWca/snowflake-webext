@@ -41,37 +41,6 @@ describe('Parse', function() {
 
   });
 
-  describe('address', function() {
-
-    it('parses IPv4', function() {
-      expect(Parse.address('')).toBeNull();
-      expect(Parse.address('3.3.3.3:4444')).toEqual({
-        host: '3.3.3.3',
-        port: 4444
-      });
-      expect(Parse.address('3.3.3.3')).toBeNull();
-      expect(Parse.address('3.3.3.3:0x1111')).toBeNull();
-      expect(Parse.address('3.3.3.3:-4444')).toBeNull();
-      expect(Parse.address('3.3.3.3:65536')).toBeNull();
-    });
-
-    it('parses IPv6', function() {
-      expect(Parse.address('[1:2::a:f]:4444')).toEqual({
-        host: '1:2::a:f',
-        port: 4444
-      });
-      expect(Parse.address('[1:2::a:f]')).toBeNull();
-      expect(Parse.address('[1:2::a:f]:0x1111')).toBeNull();
-      expect(Parse.address('[1:2::a:f]:-4444')).toBeNull();
-      expect(Parse.address('[1:2::a:f]:65536')).toBeNull();
-      expect(Parse.address('[1:2::ffff:1.2.3.4]:4444')).toEqual({
-        host: '1:2::ffff:1.2.3.4',
-        port: 4444
-      });
-    });
-
-  });
-
   describe('byte count', function() {
 
     it('returns null for bad inputs', function() {

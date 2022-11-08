@@ -58,13 +58,6 @@ describe('Snowflake', function() {
     expect(s.retries).toBe(0);
   });
 
-  it('sets relay address correctly', function() {
-    var s;
-    s = new Snowflake(config, ui, new FakeBroker());
-    s.setRelayAddr('foo');
-    expect(s.relayAddr).toEqual('foo');
-  });
-
   it('initalizes WebRTC connection', function() {
     var s;
     s = new Snowflake(config, ui, new FakeBroker());

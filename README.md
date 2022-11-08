@@ -197,7 +197,6 @@ var broker = new Broker(config.brokerUrl);
 
 var snowflake = new Snowflake(config, ui, broker);
 
-snowflake.setRelayAddr(config.relayAddr);
 snowflake.beginServingClients();
 ```
 

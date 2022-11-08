@@ -36,14 +36,14 @@ var arrayMatching = function(sample) {
 
 describe('ProxyPair', function() {
 
-  var config, destination, fakeRelay, pp, rateLimit;
-  fakeRelay = Parse.address('0.0.0.0:12345');
+  var config, destination, pp, rateLimit;
   rateLimit = new DummyRateLimit;
   config = new Config;
+  config.defaultRelayAddr = 'wss://0.0.0.0:12345';
   destination = [];
 
   // Using the mock PeerConnection definition from spec/snowflake.spec.js
-  var pp = new ProxyPair(fakeRelay, rateLimit, config);
+  var pp = new ProxyPair(rateLimit, config);
 
   beforeEach(function() {
     return pp.begin();

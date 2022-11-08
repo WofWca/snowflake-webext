@@ -2,65 +2,15 @@
 Only websocket-specific stuff.
 */
 
+// eslint-disable-next-line no-unused-vars
 class WS {
-
-  /**
-   * Build an escaped URL string from unescaped components. Only scheme and host
-   * are required. See RFC 3986, section 3.
-   */
-  static buildUrl(scheme, host, port, path, params) {
-    const parts = [];
-    parts.push(encodeURIComponent(scheme));
-    parts.push('://');
-    // If it contains a colon but no square brackets, treat it as IPv6.
-    if (host.match(/:/) && !host.match(/[[\]]/)) {
-      parts.push('[');
-      parts.push(host);
-      parts.push(']');
-    } else {
-      parts.push(encodeURIComponent(host));
-    }
-    if (undefined !== port && this.DEFAULT_PORTS[scheme] !== port) {
-      parts.push(':');
-      parts.push(encodeURIComponent(port.toString()));
-    }
-    if (undefined !== path && '' !== path) {
-      if (!path.match(/^\//)) {
-        path = '/' + path;
-      }
-      path = path.replace(/[^/]+/, function (m) {
-        return encodeURIComponent(m);
-      });
-      parts.push(path);
-    }
-    if (undefined !== params) {
-      parts.push('?');
-      parts.push(new URLSearchParams(params).toString());
-    }
-    return parts.join('');
-  }
-
-  static makeWebsocket(addr, params) {
-    const wsProtocol = this.WSS_ENABLED ? 'wss' : 'ws';
-    const url = this.buildUrl(wsProtocol, addr.host, addr.port, '/', params);
-    const ws = new WebSocket(url);
-    /*
-    'User agents can use this as a hint for how to handle incoming binary data:
-    if the attribute is set to 'blob', it is safe to spool it to disk, and if it
-    is set to 'arraybuffer', it is likely more efficient to keep the data in
-    memory.'
-    */
-    ws.binaryType = 'arraybuffer';
-    return ws;
-  }
-
   /**
    * Creates a websocket connection from a URL and params to override
    * @param {URL|string} url
    * @param {URLSearchParams|string[][]} params
    * @return {WebSocket}
    */
-  static makeWebsocketFromURL(url, params) {
+  static makeWebsocket(url, params) {
     let parsedURL = new URL(url);
     let urlpa = new URLSearchParams(params);
     urlpa.forEach(function (value, key) {
@@ -78,9 +28,12 @@ class WS {
     return ws;
   }
 
+  /**
+   * @param {URL | string} addr
+   */
   static probeWebsocket(addr) {
     return /** @type {Promise<void>} */(new Promise((resolve, reject) => {
-      const ws = WS.makeWebsocket(addr);
+      const ws = WS.makeWebsocket(addr, []);
       ws.onopen = () => {
         resolve();
         ws.close();
@@ -93,10 +46,3 @@ class WS {
   }
 
 }
-
-WS.WSS_ENABLED = true;
-
-WS.DEFAULT_PORTS = {
-  http: 80,
-  https: 443
-};

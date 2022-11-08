@@ -132,36 +132,6 @@ class Parse {
   }
 
   /**
-   * @param {string} spec
-   * Parse an address in the form 'host:port'. Returns an Object with keys 'host'
-   * (String) and 'port' (int). Returns null on error.
-   */
-  static address(spec) {
-    let m = null;
-    if (!m) {
-      // IPv6 syntax.
-      m = spec.match(/^\[([\0-9a-fA-F:.]+)\]:([0-9]+)$/);
-    }
-    if (!m) {
-      // IPv4 syntax.
-      m = spec.match(/^([0-9.]+):([0-9]+)$/);
-    }
-    if (!m) {
-      // TODO: Domain match
-      return null;
-    }
-    const host = m[1];
-    const port = parseInt(m[2], 10);
-    if (isNaN(port) || port < 0 || port > 65535) {
-      return null;
-    }
-    return {
-      host: host,
-      port: port
-    };
-  }
-
-  /**
    * Parse a count of bytes. A suffix of 'k', 'm', or 'g' (or uppercase)
    * does what you would think. Returns null on error.
    */

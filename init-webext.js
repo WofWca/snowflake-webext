@@ -69,7 +69,7 @@ class WebExtUI extends UI {
   }
 
   tryProbe() {
-    WS.probeWebsocket(config.relayAddr)
+    WS.probeWebsocket(config.defaultRelayAddr)
     .then(
       () => {
         this.missingFeature = false;
@@ -280,7 +280,6 @@ var
     // Otherwise, begin setting up WebRTC and acting as a proxy.
     dbg('Contacting Broker at ' + broker.url);
     log('Starting snowflake');
-    snowflake.setRelayAddr(config.relayAddr);
     snowflake.beginServingClients();
   };
 

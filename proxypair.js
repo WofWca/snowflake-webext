@@ -12,11 +12,10 @@ Broker with an WebRTC answer.
 class ProxyPair {
 
   /**
-   * @param relayAddr the destination relay
    * @param {*} rateLimit specifies a rate limit on traffic
    * @param {Config} config
    */
-  constructor(relayAddr, rateLimit, config) {
+  constructor(rateLimit, config) {
     this.prepareDataChannel = this.prepareDataChannel.bind(this);
     this.connectRelay = this.connectRelay.bind(this);
     this.onClientToRelayMessage = this.onClientToRelayMessage.bind(this);
@@ -24,9 +23,8 @@ class ProxyPair {
     this.onError = this.onError.bind(this);
     this.flush = this.flush.bind(this);
 
-    /** @type {string | undefined} */
-    this.relayURL = undefined;
-    this.relayAddr = relayAddr;
+    /** @type {string | URL} */
+    this.relayURL = config.defaultRelayAddr;
     this.rateLimit = rateLimit;
     this.config = config;
     this.pcConfig = config.pcConfig;
@@ -175,10 +173,7 @@ class ProxyPair {
     if (peer_ip != null) {
       params.push(["client_ip", peer_ip]);
     }
-    const relay = this.relay =
-      (this.relayURL === undefined) ?
-        WS.makeWebsocket(this.relayAddr, params) :
-        WS.makeWebsocketFromURL(this.relayURL, params);
+    const relay = this.relay = WS.makeWebsocket(this.relayURL, params);
     relay.label = 'websocket-relay';
     relay.onopen = () => {
       clearTimeout(this.connectToRelayTimeoutId);
@@ -329,7 +324,7 @@ class ProxyPair {
   }
 
   /**
-   * @param {typeof this.relayURL} relayURL
+   * @param {URL | string} relayURL
    */
   setRelayURL(relayURL) {
     this.relayURL = relayURL;

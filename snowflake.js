@@ -38,17 +38,6 @@ class Snowflake {
   }
 
   /**
-   * Set the target relay address spec, which is expected to be websocket.
-   * TODO: Should potentially fetch the target from broker later, or modify
-   * entirely for the Tor-independent version.
-   * @param {{ host: string; port: string; }} relayAddr
-   */
-  setRelayAddr(relayAddr) {
-    this.relayAddr = relayAddr;
-    log('Using ' + relayAddr.host + ':' + relayAddr.port + ' as Relay.');
-  }
-
-  /**
    * Start asking the broker for clients and serving them.
    */
   beginServingClients() {
@@ -171,7 +160,7 @@ class Snowflake {
    * @private
    */
   makeProxyPair() {
-    const pair = new ProxyPair(this.relayAddr, this.rateLimit, this.config);
+    const pair = new ProxyPair(this.rateLimit, this.config);
     this.proxyPairs.push(pair);
 
     log('Snowflake IDs: ' + (this.proxyPairs.map(p => p.id)).join(' | '));
@@ -225,7 +214,6 @@ class Snowflake {
 
 }
 
-Snowflake.prototype.relayAddr = null;
 Snowflake.prototype.rateLimit = null;
 
 Snowflake.MESSAGE = {

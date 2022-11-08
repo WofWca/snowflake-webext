@@ -174,13 +174,12 @@ var
   };
 
   tryProbe = function() {
-    WS.probeWebsocket(config.relayAddr)
+    WS.probeWebsocket(config.defaultRelayAddr)
     .then(
       () => {
         ui.turnOn();
         dbg('Contacting Broker at ' + broker.url);
         log('Starting snowflake');
-        snowflake.setRelayAddr(config.relayAddr);
         snowflake.beginServingClients();
       },
       () => {
