@@ -299,7 +299,7 @@ class ProxyPair {
       clearTimeout(this.flush_timeout_id);
       this.flush_timeout_id = null;
     }
-    if (this.r2cSchedule.length > 0 || this.c2rSchedule.length > 0 || (this.relayIsReady() && this.relay.bufferedAmount > 0) || (this.webrtcIsReady() && this.client.bufferedAmount > 0)) {
+    if (this.r2cSchedule.length > 0 || this.c2rSchedule.length > 0) {
       this.flush_timeout_id = setTimeout(this.flush, this.rateLimit.when() * 1000);
     }
   }
