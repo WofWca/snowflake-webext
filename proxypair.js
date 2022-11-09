@@ -12,7 +12,7 @@ Broker with an WebRTC answer.
 class ProxyPair {
 
   /**
-   * @param {*} rateLimit specifies a rate limit on traffic
+   * @param {DummyRateLimit | BucketRateLimit} rateLimit specifies a rate limit on traffic
    * @param {Config} config
    */
   constructor(rateLimit, config) {
