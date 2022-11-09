@@ -181,25 +181,42 @@ class WebExtUI extends UI {
 
   setIcon() {
     let path = null;
+    let badgeText = '';
     if (!this.enabled) {
       path = {
         48: "assets/toolbar-off-48.png",
         96: "assets/toolbar-off-96.png"
       };
-    } else if (this.active) {
-      path = {
-        48: "assets/toolbar-running-48.png",
-        96: "assets/toolbar-running-96.png"
-      };
     } else {
-      path = {
-        48: "assets/toolbar-on-48.png",
-        96: "assets/toolbar-on-96.png"
-      };
+      if (this.active) {
+        path = {
+          48: "assets/toolbar-running-48.png",
+          96: "assets/toolbar-running-96.png"
+        };
+      } else {
+        path = {
+          48: "assets/toolbar-on-48.png",
+          96: "assets/toolbar-on-96.png"
+        };
+      }
+
+      const totalClients = this.stats.reduce((t, c) => t + c, 0);
+      if (totalClients > 0) {
+        if (config.maxNumClients > 1 && this.clients > 0) {
+          // Like `19+3`
+          badgeText = `${totalClients - this.clients}+${this.clients}`;
+        } else {
+          badgeText = `${totalClients}`;
+        }
+      }
     }
     chrome.browserAction.setIcon({
       path: path,
     });
+    // Color is taken from Tor Browser (tor-styles.css, `purple-30`,
+    // with lightness changed to 81%).
+    chrome.browserAction.setBadgeBackgroundColor({ color: '#d79eff' });
+    chrome.browserAction.setBadgeText({ text: badgeText });
   }
 
 }
