@@ -27,7 +27,6 @@ class ProxyPair {
     this.relayURL = config.defaultRelayAddr;
     this.rateLimit = rateLimit;
     this.config = config;
-    this.pcConfig = config.pcConfig;
     this.id = Util.genSnowflakeID();
     this.c2rSchedule = [];
     this.r2cSchedule = [];
@@ -37,7 +36,7 @@ class ProxyPair {
   /** Prepare a WebRTC PeerConnection and await for an SDP offer. */
   begin() {
     /** @private */
-    this.pc = new RTCPeerConnection(this.pcConfig);
+    this.pc = new RTCPeerConnection(this.config.pcConfig);
     // OnDataChannel triggered remotely from the client when connection succeeds.
     this.pc.ondatachannel = ({ channel }) => {
       dbg('Data Channel established...');
