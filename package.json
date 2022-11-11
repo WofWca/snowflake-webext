@@ -1,6 +1,6 @@
 {
   "name": "snowflake-pt",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "description": "Allow users in censored countries to use your network connection to access the Tor network.",
   "main": "build/snowflake.js",
   "directories": {
